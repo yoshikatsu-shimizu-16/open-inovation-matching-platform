@@ -25,7 +25,7 @@ Claude Code向け互換層は `.claude/skills/sdd-*/SKILL.md` に置く。
 - `hono-backend-boilerplate/`: Hono backendのreference implementation
 - `cloudflare-runtime/`: Workers、D1、R2、Terraform、runtime verification
 
-上記2件は全体要件導入前のスターター雛形用SPECであり、Harnessの移行例外とする。新しいアプリ機能SPECには、全体要件とconstitutionのレビューを必須とする。
+上記2件は全体要件導入前のスターター雛形用SPECであり、Harnessの移行例外とする。先行作成した `initial-demo-experience` は `docs/drafts/` に保管し、全体要件とconstitutionのレビュー後にFR/NFRへ対応付けて再整理する。
 
 ## Boundary
 
