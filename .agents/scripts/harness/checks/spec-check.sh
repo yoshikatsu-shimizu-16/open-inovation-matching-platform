@@ -3,9 +3,10 @@ set -euo pipefail
 
 # Mechanical pre-check for the sdd-analyze skill
 # (.agents/skills/sdd-analyze/SKILL.md, mirrored at .claude/skills/sdd-analyze/SKILL.md).
-# Catches structural gaps (unreviewed docs, missing requirement IDs, missing
-# requirement<->task traceability, missing per-task verification fields) that
-# would otherwise let a malformed or unreviewed spec pass Gate 0 silently.
+# Stage mode validates the artifacts created so far and enforces review order.
+# Complete mode additionally catches missing or unreviewed documents, missing
+# requirement<->task traceability, and missing task verification fields before
+# sdd-analyze proceeds.
 # It does not judge semantic correctness (constitution violations, terminology
 # drift) — that remains the analyze skill's job.
 
@@ -18,6 +19,13 @@ fi
 
 status=0
 found_feature=0
+mode="${1:---stage}"
+
+if [[ "$mode" != "--stage" && "$mode" != "--complete" ]]; then
+  echo "ERROR: unknown spec-check mode: $mode" >&2
+  echo "usage: $0 [--stage|--complete]" >&2
+  exit 64
+fi
 
 for feature_dir in "$specs_dir"/*/; do
   [[ -d "$feature_dir" ]] || continue
@@ -28,28 +36,51 @@ for feature_dir in "$specs_dir"/*/; do
   design="${feature_dir}design.md"
   tasks="${feature_dir}tasks.md"
 
-  missing=0
-  for f in "$req" "$design" "$tasks"; do
-    if [[ ! -f "$f" ]]; then
-      echo "ERROR: [$feature] missing $f"
-      status=1
-      missing=1
-    fi
-  done
-  [[ $missing -eq 0 ]] || continue
-
-  for f in "$req" "$design" "$tasks"; do
-    if ! grep -qE '^\s*-\s*\[x\]\s*レビュー済み' "$f"; then
-      echo "ERROR: [$feature] $(basename "$f") is not marked reviewed (## Review checkbox unchecked)"
-      status=1
-    fi
-  done
+  if [[ ! -f "$req" ]]; then
+    echo "ERROR: [$feature] missing $req"
+    status=1
+    continue
+  fi
 
   req_ids=$(grep -oE 'REQ-[0-9]+' "$req" | sort -u || true)
   if [[ -z "$req_ids" ]]; then
     echo "ERROR: [$feature] requirements.md has no stable requirement IDs (REQ-NNN)"
     status=1
   fi
+
+  req_reviewed=0
+  design_reviewed=0
+  tasks_reviewed=0
+  grep -qE '^\s*-\s*\[x\]\s*レビュー済み' "$req" && req_reviewed=1
+  [[ -f "$design" ]] && grep -qE '^\s*-\s*\[x\]\s*レビュー済み' "$design" && design_reviewed=1
+  [[ -f "$tasks" ]] && grep -qE '^\s*-\s*\[x\]\s*レビュー済み' "$tasks" && tasks_reviewed=1
+
+  if [[ -f "$design" && $req_reviewed -eq 0 ]]; then
+    echo "ERROR: [$feature] design.md exists before requirements.md is marked reviewed"
+    status=1
+  fi
+
+  if [[ -f "$tasks" && ! -f "$design" ]]; then
+    echo "ERROR: [$feature] tasks.md exists without design.md"
+    status=1
+  elif [[ -f "$tasks" && $design_reviewed -eq 0 ]]; then
+    echo "ERROR: [$feature] tasks.md exists before design.md is marked reviewed"
+    status=1
+  fi
+
+  if [[ "$mode" == "--complete" ]]; then
+    for f in "$req" "$design" "$tasks"; do
+      if [[ ! -f "$f" ]]; then
+        echo "ERROR: [$feature] missing $f"
+        status=1
+      elif ! grep -qE '^\s*-\s*\[x\]\s*レビュー済み' "$f"; then
+        echo "ERROR: [$feature] $(basename "$f") is not marked reviewed (## Review checkbox unchecked)"
+        status=1
+      fi
+    done
+  fi
+
+  [[ -f "$tasks" ]] || continue
 
   while IFS= read -r id; do
     [[ -z "$id" ]] && continue

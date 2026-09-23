@@ -138,12 +138,19 @@ for hook_file in .claude/settings.json .codex/hooks.json; do
     echo "ERROR: Stop hook missing from $hook_file"
     exit 1
   fi
-
-  if ! grep -F 'npm run harness:verify -- --hook' "$hook_file" >/dev/null; then
-    echo "ERROR: $hook_file must delegate to npm run harness:verify -- --hook"
-    exit 1
-  fi
 done
+
+if ! grep -F 'npm run harness:verify -- --hook' .claude/settings.json >/dev/null; then
+  echo "ERROR: .claude/settings.json must delegate to npm run harness:verify -- --hook"
+  exit 1
+fi
+
+# CodexのStop HookはstdoutがJSON専用。npmのログを隔離するwrapper経由で検証する。
+if ! grep -F 'node .codex/stop-harness-json.mjs' .codex/hooks.json >/dev/null ||
+   ! grep -F 'spawnSync("npm", ["run", "harness:verify", "--", "--hook"]' .codex/stop-harness-json.mjs >/dev/null; then
+  echo "ERROR: .codex/hooks.json must delegate to npm run harness:verify -- --hook through its JSON wrapper"
+  exit 1
+fi
 
 if ! grep -F 'hooks = true' .codex/config.toml >/dev/null; then
   echo "ERROR: .codex/config.toml must enable lifecycle hooks"
