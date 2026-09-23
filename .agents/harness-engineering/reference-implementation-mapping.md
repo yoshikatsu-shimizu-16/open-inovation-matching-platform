@@ -137,7 +137,7 @@ Source: https://github.com/github/spec-kit , https://github.blog/ai-and-ml/gener
 
 取り込み:
 
-- `constitution`(プロジェクトに1回だけ、不可侵の原則) → `specify` → `plan` → `tasks` → `analyze`(整合性ゲート、read-only) → `implement`
+- `project requirements`(FR/NFR台帳) → `constitution`(共通原則) → `specify` → `plan` → `tasks` → `analyze`(整合性ゲート、read-only) → `implement`
 - `/specs/<feature>/`というper-feature ディレクトリ規約
 - specをスキル(実行手順+出力先の明示)として構造化する考え方
 - `analyze`ゲートのうち機械的に判定できる部分(レビュー完了・要求ID・traceability・検証フィールドの有無)はスクリプトで強制する
@@ -145,6 +145,8 @@ Source: https://github.com/github/spec-kit , https://github.blog/ai-and-ml/gener
 対応:
 
 - `.agents/sdd/constitution.md`
+- `docs/project-requirements.md`（フォーク先で作成する全体要件）
+- `.agents/skills/sdd-{project-requirements,constitution}/SKILL.md`
 - `.agents/skills/sdd-{specify,plan,tasks,analyze}/SKILL.md`(実体)
 - `.claude/skills/sdd-{specify,plan,tasks,analyze}/SKILL.md`(Claude Code用転送)
 - `docs/specs/README.md`

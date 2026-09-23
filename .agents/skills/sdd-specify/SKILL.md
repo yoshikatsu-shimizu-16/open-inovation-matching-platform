@@ -1,6 +1,6 @@
 ---
 name: sdd-specify
-description: 機能要求をEARS形式のrequirements.mdへ変換する。ユーザー可視の振る舞いを持つ新機能に着手する時、実装より先に使う。
+description: 全体要件とconstitutionの人間レビュー後、FR/NFRに対応する機能要求をEARS形式のrequirements.mdへ変換する。
 ---
 
 # Specify
@@ -19,21 +19,23 @@ description: 機能要求をEARS形式のrequirements.mdへ変換する。ユー
 ## Inputs
 
 - 機能の要求(ユーザーからの依頼、Issue等)
+- レビュー済みの `docs/project-requirements.md` と対応する `FR/NFR`
 - `.agents/sdd/constitution.md`
 - 既存の`docs/specs/`配下に類似機能がないか
 
 ## Steps
 
-1. `.agents/sdd/constitution.md`を読み、矛盾する要求がないか確認する。
-2. `docs/specs/<feature-slug>/`ディレクトリを作る(`<feature-slug>`は機能を表す短いkebab-case名)。
-3. `.agents/sdd/templates/requirements.template.md`を
+1. 全体要件とconstitutionのレビュー完了を確認する。未完了なら機能SPECを作らず、対応するスキルへ戻す。
+2. 対応元の `FR/NFR` IDを選び、要求台帳の「対応SPEC」欄と仕様側の「Parent requirements」を相互に結ぶ。複数機能に関係するNFRは各SPECから参照する。
+3. `docs/specs/<feature-slug>/`ディレクトリを作る(`<feature-slug>`は機能を表す短いkebab-case名)。
+4. `.agents/sdd/templates/requirements.template.md`を
    `docs/specs/<feature-slug>/requirements.md`へコピーする。
-4. Overview、User storiesを埋める。
-5. Requirementsを EARS記法(`.agents/sdd/README.md`の早見表)で書く。
+5. Overview、User storiesを埋める。
+6. Requirementsを EARS記法(`.agents/sdd/README.md`の早見表)で書く。
    曖昧な自然文のままにしない。各要求に`REQ-001`のような安定したIDを付ける
    (`design.md`のtraceability表・`tasks.md`の`verifies`から参照される)。
-6. Out of scopeを明記する。
-7. Constitution alignmentで、constitution.mdのどの原則と関連するかを書く。
+7. Out of scopeを明記する。
+8. Constitution alignmentで、constitution.mdのどの原則と関連するかを書く。
 
 ## Stop condition
 

@@ -1,30 +1,37 @@
 # Project Constitution
 
-> **singleton**: このファイルはプロジェクトに1つだけ存在する。V字モデルの
-> 要件定義・基本設計に相当する持続的文書であり、`docs/specs/<feature>/`のように
-> 機能ごとに繰り返し作られるものではない。フォーク先プロジェクトが最初に埋め、
-> 以後は改訂のみ行う。
-
-参考: GitHub Spec Kit "constitution" — https://github.com/github/spec-kit
+> **singleton / template**: このファイルはプロジェクトに1つだけ置き、レビュー後も理由と影響を記録して改訂できる。事業全体の機能・非機能要求は `docs/project-requirements.md` に置く。以下の記入例は採用済みの原則ではない。
 
 ## Purpose
 
-プロジェクト全体で守る不可侵の原則を1箇所に集約する。`docs/specs/<feature>/requirements.md`の
-各EARS要求は、この原則に反しないことが前提となる(違反があれば`skills/analyze/`が検出する)。
+機能ごとの仕様に共通する、プロジェクト固有の設計・開発原則を定める。機能一覧、個別の受入条件、実装タスクは重複させない。
 
 ## Principles
 
-- 技術選定: (例: 使用するprofile、フレームワーク、runtime)
-- アーキテクチャ制約: `ARCHITECTURE.md` / `profiles/<technology>/architecture-rules.md` に従う
-- 破壊的変更の扱い: `standards/ai-development-rules.md` §4 Approval boundary に従う
-- テスト方針: `harness/verification-matrix.md` に従う
-- ここにプロジェクト固有の不可侵原則を追記する
+<全体要件のレビュー後、適用する原則をID付きで記述する。>
+
+記入例（採用する場合は全体要件と照合し、具体的な原則へ書き換える）:
+
+- `P-001` 実行境界: 本番の実行基盤をCloudflare Workersとし、ローカル開発用の仕組みを本番依存にしない。
+- `P-002` AIと人の責任境界: AIが整理した内容を検証し、人の確認前に確定情報として利用しない。
+- `P-003` 情報保護: 認証情報をサーバー側に置き、相談内容や未公開知財を一般ログへ無制限に出さない。
+- `P-004` 変更と検証: 機能の契約変更前にSPECを更新し、品質ゲートの結果で完了を判断する。
+
+## Change process
+
+原則を変更するときは理由、影響するFR/NFR・機能別SPEC、改訂日を残し、人間のレビューを受ける。古い原則IDは別の意味に再利用しない。
 
 ## Non-goals
 
-- ここに書かない: 個別機能の詳細な要求(→ `docs/specs/<feature>/requirements.md`)
-- ここに書かない: 実装手順・タスク分解(→ `docs/specs/<feature>/tasks.md`)
+- 全体の機能・非機能要求（`docs/project-requirements.md`）
+- 機能別要求・設計・タスク（`docs/specs/<feature>/`）
 
 ## Change history
 
-- YYYY-MM-DD: 初版作成
+| 日付 | 原則ID | 理由・影響 | レビュー |
+| --- | --- | --- | --- |
+| <YYYY-MM-DD> | <P-ID> | <変更理由と影響するFR/NFR・SPEC> | <確認者または未レビュー> |
+
+## Review
+
+- [ ] レビュー済み

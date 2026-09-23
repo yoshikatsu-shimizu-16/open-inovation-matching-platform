@@ -43,6 +43,8 @@ run_harness() (
     echo
     echo "==> spec-check (docs/specs/ review, requirement traceability, task verification fields)"
     bash "$CHECKS_DIR/spec-check.sh" "$spec_mode"
+    echo "==> spec-check regression tests"
+    node --test "$SCRIPT_DIR/tests/spec-check.test.mjs"
   fi
 
   if [[ -f "$CHECKS_DIR/source-layout-check.mjs" ]]; then

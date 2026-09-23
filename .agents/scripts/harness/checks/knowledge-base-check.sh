@@ -20,6 +20,7 @@ required=(
   "$HARNESS_DIR/harness-verify-orchestrator.sh"
   "$CHECKS_DIR/knowledge-base-check.sh"
   "$CHECKS_DIR/spec-check.sh"
+  "$HARNESS_DIR/tests/spec-check.test.mjs"
   "$CHECKS_DIR/source-layout-check.mjs"
   "$HARNESS_DIR/setup/bootstrap.sh"
   ".claude/settings.json"
@@ -110,7 +111,7 @@ fi
 
 # SDD skillは各Agentが実際に探索する場所
 # (.agents/skills/ for Codex etc., .claude/skills/ for Claude Code) に配置する。
-for skill in sdd-specify sdd-plan sdd-tasks sdd-analyze; do
+for skill in sdd-project-requirements sdd-constitution sdd-specify sdd-plan sdd-tasks sdd-analyze; do
   agents_file=".agents/skills/${skill}/SKILL.md"
   claude_file=".claude/skills/${skill}/SKILL.md"
   for f in "$agents_file" "$claude_file"; do
@@ -169,6 +170,7 @@ NODE
 bash -n "$HARNESS_DIR/harness-verify-orchestrator.sh"
 bash -n "$CHECKS_DIR/knowledge-base-check.sh"
 bash -n "$CHECKS_DIR/spec-check.sh"
+node --check "$HARNESS_DIR/tests/spec-check.test.mjs"
 bash -n "$HARNESS_DIR/setup/bootstrap.sh"
 node --check "$CHECKS_DIR/source-layout-check.mjs"
 

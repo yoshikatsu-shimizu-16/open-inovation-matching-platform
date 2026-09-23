@@ -3,6 +3,10 @@
 > 出力元: `sdd-specify` スキル(`.agents/skills/sdd-specify/SKILL.md`)
 > 出力先: `docs/specs/<feature>/requirements.md`
 
+## Parent requirements
+
+`docs/project-requirements.md` の対応元IDを明記する（例: `FR-001`, `NFR-001`）。全体要件台帳の「対応SPEC」欄にもこの機能のディレクトリ名を記す。
+
 ## Overview
 
 何のための機能か、1〜3文で書く。
@@ -27,7 +31,7 @@ EARS記法(`spec-driven-development/README.md`の早見表を参照)で書く。
 
 ## Constitution alignment
 
-`spec-driven-development/constitution.md`のどの原則に関連するか、矛盾しないかを記す。
+`.agents/sdd/constitution.md`のどの原則に関連するか、矛盾しないかを記す。
 
 ## Review
 
