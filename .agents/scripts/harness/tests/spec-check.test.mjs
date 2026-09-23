@@ -26,9 +26,8 @@ const nfr = () => "| NFR-001 | 秘密を守る | 予定 | 1 | — | — | — |"
 function runFixture({ rows = [fr(), nfr()], projectReviewed = true, constitutionReviewed = true, feature = true, legacy = false, parent = "FR-001", omitProject = false }) {
   const root = mkdtempSync(join(tmpdir(), "sdd-spec-check-"));
   try {
-    mkdirSync(join(root, ".agents/sdd"), { recursive: true });
     mkdirSync(join(root, "docs/specs"), { recursive: true });
-    writeFileSync(join(root, ".agents/sdd/constitution.md"), constitution(constitutionReviewed));
+    writeFileSync(join(root, "docs/constitution.md"), constitution(constitutionReviewed));
     if (!omitProject) writeFileSync(join(root, "docs/project-requirements.md"), project(rows, projectReviewed));
     if (feature) {
       mkdirSync(join(root, "docs/specs/dialogue"));

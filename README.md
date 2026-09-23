@@ -20,6 +20,8 @@ dev-standard-kit/
 ├── infrastructure/           # Wrangler / Terraform / migrations
 │
 ├── docs/
+│   ├── project-requirements.md # 全体要件
+│   ├── constitution.md         # プロジェクト共通原則
 │   ├── specs/                # requirements / design / tasks
 │   ├── design-docs/
 │   ├── exec-plans/
@@ -28,7 +30,7 @@ dev-standard-kit/
 ├── .agents/                  # AI Development System
 │   ├── README.md
 │   ├── skills/               # canonical Agent Skills
-│   ├── sdd/                  # constitution / SDD templates
+│   ├── sdd/                  # SDD method / templates
 │   ├── standards/
 │   ├── profiles/
 │   ├── harness-engineering/
@@ -74,8 +76,8 @@ Evidence-based handoff
 SDDは「実行方法」と「成果物」を分けます。
 
 - 実行方法: `.agents/skills/sdd-*`、`.agents/sdd/`
-- プロジェクト原則: `.agents/sdd/constitution.md`
-- 人間と共有する成果物: `docs/specs/<feature>/`
+- プロジェクト原則: `docs/constitution.md`
+- 人間と共有する成果物: `docs/project-requirements.md`、`docs/constitution.md`、`docs/specs/<feature>/`
 
 機能ごとに次を作ります。
 

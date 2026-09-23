@@ -35,7 +35,7 @@ AI開発基盤の内部実装は `.agents/` に閉じ込め、通常のアプリ
 3. Application Development Mode / Kit Maintenance Mode のどちらかを明確にする。通常はApplication Development Mode。
 4. `git status` と最近の履歴を確認する。
 5. アプリ機能を扱う場合は `docs/project-requirements.md` のFR/NFR台帳とレビュー状態を確認する。
-6. `.agents/sdd/constitution.md` を読む。
+6. `docs/constitution.md` を読む。
 7. 関係する既存の `docs/specs/`、design docs、`.agents/profiles/` を読む。
 8. タスクの目的、acceptance criteria、risk boundaryを整理する。
 

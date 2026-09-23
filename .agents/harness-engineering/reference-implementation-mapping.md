@@ -128,7 +128,7 @@ Source: https://kiro.dev/docs/specs/ , https://kiro.dev/docs/specs/best-practice
 対応:
 
 - `.agents/sdd/README.md`
-- `.agents/sdd/constitution.md`
+- `docs/constitution.md`
 - `.agents/sdd/templates/{requirements,design,tasks}.template.md`
 
 ## GitHub Spec Kit
@@ -144,7 +144,7 @@ Source: https://github.com/github/spec-kit , https://github.blog/ai-and-ml/gener
 
 対応:
 
-- `.agents/sdd/constitution.md`
+- `docs/constitution.md`
 - `docs/project-requirements.md`（フォーク先で作成する全体要件）
 - `.agents/skills/sdd-{project-requirements,constitution}/SKILL.md`
 - `.agents/skills/sdd-{specify,plan,tasks,analyze}/SKILL.md`(実体)

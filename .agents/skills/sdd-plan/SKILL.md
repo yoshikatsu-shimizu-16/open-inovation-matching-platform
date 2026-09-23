@@ -14,7 +14,7 @@ description: レビュー済みのrequirements.mdから技術設計(design.md)�
 
 - `docs/specs/<feature-slug>/requirements.md`(`## Review`にチェックが入っていること)
 - `ARCHITECTURE.md`、該当する`.agents/profiles/<technology>/architecture-rules.md`
-- `.agents/sdd/constitution.md`
+- `docs/constitution.md`
 
 ## Steps
 

@@ -12,7 +12,7 @@ description: requirements.md・design.md・tasks.mdの整合性をconstitution.m
 ## Inputs
 
 - `docs/specs/<feature-slug>/{requirements,design,tasks}.md`
-- `.agents/sdd/constitution.md`
+- `docs/constitution.md`
 
 ## Steps
 
@@ -30,7 +30,7 @@ npm run harness:verify -- --spec-complete
 
 1. **要求→設計の対応漏れ**: requirements.mdの各要求ID(REQ-NNN)がdesign.mdのRequirements traceability表に現れているか。
 2. **設計→タスクの対応漏れ**: design.mdの各コンポーネント/データモデル変更が、tasks.mdの`verifies`フィールドで少なくとも1つのタスクに紐づいているか。
-3. **constitution違反**: requirements.md・design.mdの内容が `.agents/sdd/constitution.md` のPrinciplesに反していないか。
+3. **constitution違反**: requirements.md・design.mdの内容が `docs/constitution.md` のPrinciplesに反していないか。
 4. **用語の一貫性**: 3ファイル間で同じ概念に異なる呼び方をしていないか。
 5. **matrix対応の妥当性**: tasks.mdの各`checks`フィールドの値が `.agents/harness-engineering/verification-matrix.md` の該当する変更種別と整合しているか。
 

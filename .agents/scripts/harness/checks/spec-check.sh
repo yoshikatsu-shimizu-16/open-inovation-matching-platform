@@ -45,7 +45,7 @@ const path = require("node:path");
 
 const [mode, ...features] = process.argv.slice(2);
 const projectPath = "docs/project-requirements.md";
-const constitutionPath = ".agents/sdd/constitution.md";
+const constitutionPath = "docs/constitution.md";
 const errors = [];
 const exists = fs.existsSync(projectPath);
 const project = exists ? fs.readFileSync(projectPath, "utf8") : "";

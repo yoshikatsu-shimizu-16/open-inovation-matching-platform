@@ -30,7 +30,7 @@ AI Coding Agent の制御・開発標準・Harness Engineering・Loop Engineerin
 - Database: Cloudflare D1
 - Object Storage: Cloudflare R2
 
-実プロジェクトで技術を変更する場合は、`.agents/sdd/constitution.md` と該当する `.agents/profiles/` を更新し、変更理由を設計判断として残す。
+実プロジェクトで技術を変更する場合は、`docs/constitution.md` と該当する `.agents/profiles/` を更新し、変更理由を設計判断として残す。
 
 ## Read first
 
@@ -38,14 +38,15 @@ AI Coding Agent の制御・開発標準・Harness Engineering・Loop Engineerin
 2. `WORKFLOW.md` — Fork後の標準開発フロー
 3. `.agents/README.md` — AI開発基盤の入口
 4. `docs/project-requirements.md` — フォーク先アプリの全体要件・FR/NFR台帳（作成後）
-5. `.agents/sdd/constitution.md` — 全機能に共通する原則（全体要件のレビュー後に確定）
+5. `docs/constitution.md` — 全機能に共通する原則（全体要件のレビュー後に確定）
 6. `docs/specs/` — 機能ごとの requirements / design / tasks
-7. `.agents/standards/` — 技術非依存の共通ルール
-8. `.agents/harness-engineering/` — task contract、quality gates、verification、lifecycle
-9. `.agents/profiles/` — React / Hono / Cloudflare 等の技術固有ルール
-10. `.agents/loop-engineering/` — 長時間・自律実行のloop contract
-11. `docs/design-docs/` — 設計判断とcore beliefs
-12. `docs/exec-plans/` — 長時間・複雑作業のexecution plan
+7. `.agents/sdd/` — SDDの実行方法とテンプレート
+8. `.agents/standards/` — 技術非依存の共通ルール
+9. `.agents/harness-engineering/` — task contract、quality gates、verification、lifecycle
+10. `.agents/profiles/` — React / Hono / Cloudflare 等の技術固有ルール
+11. `.agents/loop-engineering/` — 長時間・自律実行のloop contract
+12. `docs/design-docs/` — 設計判断とcore beliefs
+13. `docs/exec-plans/` — 長時間・複雑作業のexecution plan
 
 ## Application areas
 
@@ -80,7 +81,7 @@ AI Coding Agent の制御・開発標準・Harness Engineering・Loop Engineerin
 
 1. Application Development Mode か Kit Maintenance Mode かを判定する。通常は前者。
 2. `git status` と最近の履歴を確認する。
-3. 全体要件、`.agents/sdd/constitution.md` と関係する既存specを読む。アプリの機能別SPECより先に全体要件とconstitutionを人間がレビューする。
+3. 全体要件、`docs/constitution.md` と関係する既存specを読む。アプリの機能別SPECより先に全体要件とconstitutionを人間がレビューする。
 4. ユーザー可視の振る舞い、API契約、データ契約を変更する場合は、実装より先に `docs/specs/<feature>/` の requirements → design → tasks → analyze を進める。
 5. 実装対象を `frontend/`・`backend/`・`infrastructure/` のどこに置くか決める。
 6. acceptance criteria と verification を決める。

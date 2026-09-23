@@ -31,7 +31,7 @@ EARS記法(`spec-driven-development/README.md`の早見表を参照)で書く。
 
 ## Constitution alignment
 
-`.agents/sdd/constitution.md`のどの原則に関連するか、矛盾しないかを記す。
+`docs/constitution.md`のどの原則に関連するか、矛盾しないかを記す。
 
 ## Review
 
