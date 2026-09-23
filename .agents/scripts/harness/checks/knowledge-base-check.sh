@@ -13,7 +13,7 @@ required=(
   ".agents/harness-engineering/agent-hook-enforcement.md"
   ".agents/loop-engineering/README.md"
   ".agents/sdd/README.md"
-  ".agents/sdd/constitution.md"
+  "docs/constitution.md"
   ".agents/standards"
   ".agents/profiles"
   ".agents/templates"

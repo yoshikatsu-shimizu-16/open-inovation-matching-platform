@@ -37,6 +37,6 @@ Agentの方法論と、プロジェクトの仕様成果物を混在させない
 ## 関連
 
 - 手法: `.agents/sdd/README.md`
-- プロジェクト全体の不可侵原則: `.agents/sdd/constitution.md`
+- プロジェクト全体の不可侵原則: `docs/constitution.md`
 - プロジェクト全体の機能・非機能要件と進捗: `docs/project-requirements.md`
 - ユーザー可視の振る舞いを持たない複雑作業: `docs/exec-plans/`

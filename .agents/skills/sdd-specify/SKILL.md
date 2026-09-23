@@ -20,7 +20,7 @@ description: 全体要件とconstitutionの人間レビュー後、FR/NFRに対�
 
 - 機能の要求(ユーザーからの依頼、Issue等)
 - レビュー済みの `docs/project-requirements.md` と対応する `FR/NFR`
-- `.agents/sdd/constitution.md`
+- `docs/constitution.md`
 - 既存の`docs/specs/`配下に類似機能がないか
 
 ## Steps

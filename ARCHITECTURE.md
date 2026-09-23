@@ -29,7 +29,7 @@ docs/            # 人間と共有する仕様・設計判断・実行計画
 .agents/
 ├── README.md                 # AI開発基盤の入口
 ├── skills/                   # Codex等が発見するcanonical skills
-├── sdd/                      # constitution / SDD method / templates
+├── sdd/                      # SDD method / templates
 ├── standards/                # technology-independent rules
 ├── profiles/                 # technology-specific constraints
 ├── harness-engineering/      # quality gates / verification / task contract / lifecycle
@@ -55,6 +55,8 @@ docs/            # 人間と共有する仕様・設計判断・実行計画
 ├── backend/                  # backend scaffold → application code
 ├── infrastructure/           # infrastructure scaffold → application config
 ├── docs/
+│   ├── project-requirements.md # project requirements / FR・NFR register
+│   ├── constitution.md       # project principles
 │   ├── specs/                # feature requirements / design / tasks
 │   ├── design-docs/          # durable design decisions
 │   ├── exec-plans/           # complex non-feature work
@@ -101,9 +103,9 @@ frontendとbackend間の契約、backendとinfrastructure間のruntime契約は�
 SDDは「実行方法」と「成果物」を分離する。
 
 - AgentがSDDをどう進めるか: `.agents/skills/` と `.agents/sdd/`
-- 人間とAgentが共有する機能仕様: `docs/specs/<feature>/`
+- 人間とAgentが共有する全体要件・共通原則・機能仕様: `docs/project-requirements.md`、`docs/constitution.md`、`docs/specs/<feature>/`
 
-つまり、SDDの仕組みはAgent側に隠し、requirements / design / tasksという成果物は通常のドキュメントとして見える状態にする。
+つまり、SDDの仕組みはAgent側に隠し、全体要件・constitution・requirements / design / tasksという成果物は通常のドキュメントとして見える状態にする。
 
 ## Harness Engineering boundary
 

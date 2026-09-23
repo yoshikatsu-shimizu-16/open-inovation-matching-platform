@@ -83,7 +83,7 @@
 ## Constitution alignment
 
 - `ARCHITECTURE.md` の frontend/backend/infrastructure 境界、既存の Cloudflare runtime 要件と整合させる。参照先からは業務上の責務と体験を継承する。
-- 仕様のレビュー後に design → tasks → analyze → 小タスク実装へ進む。`.agents/sdd/constitution.md` はまだ雛形のため、設計前にプロジェクト固有原則を確定する。
+- 仕様のレビュー後に design → tasks → analyze → 小タスク実装へ進む。この草案の作成時点では constitution が雛形だったため、設計前にプロジェクト固有原則のレビューを必要としていた。現在の共通原則は `docs/constitution.md` を参照する。
 - 検証は `.agents/harness-engineering/verification-matrix.md` と `npm run harness:verify` に従う。
 
 ## Review

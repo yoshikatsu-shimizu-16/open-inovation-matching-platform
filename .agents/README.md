@@ -9,7 +9,7 @@
 ```text
 .agents/
 ├── skills/                 # Codex等が発見するcanonical skills
-├── sdd/                    # constitution / SDD method / templates
+├── sdd/                    # SDD method / templates
 ├── standards/              # 技術非依存の共通ルール
 ├── profiles/               # React / Hono / Cloudflare等の技術固有ルール
 ├── harness-engineering/    # quality gates / verification matrix / task contract
@@ -49,7 +49,7 @@
 
 - 実行方法: `.agents/skills/sdd-*` と `.agents/sdd/`
 - 全体要件: `docs/project-requirements.md`（`sdd-project-requirements`で作成）
-- 共通原則: `.agents/sdd/constitution.md`（`sdd-constitution`で作成）
+- 共通原則: `docs/constitution.md`（`sdd-constitution`で作成）
 - 機能別成果物: `docs/specs/<feature>/requirements.md`、`design.md`、`tasks.md`
 
 ## Harness Engineering

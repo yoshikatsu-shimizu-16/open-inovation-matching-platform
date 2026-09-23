@@ -29,7 +29,7 @@ implement
 | V字モデルの工程 | このkitでの対応 | 頻度 |
 |---|---|---|
 | 全体要件定義 | `docs/project-requirements.md` | プロジェクトに1つ、変更時は改訂 |
-| 共通原則 | `.agents/sdd/constitution.md` | プロジェクトに1つ、変更時は影響確認と再レビュー |
+| 共通原則 | `docs/constitution.md` | プロジェクトに1つ、変更時は影響確認と再レビュー |
 | 詳細設計〜実装計画 | `docs/specs/<feature>/{requirements,design,tasks}.md` | 機能(feature)ごとに繰り返す |
 | 実装 | 通常の実装作業(1タスク単位は`.agents/harness-engineering/task-contract-template.md`を併用) | tasks.mdの各項目ごと |
 | 単体テスト | `.agents/harness-engineering/quality-gates.md` Gate 1-2。requirements.mdのacceptance criteria(EARS)をテストへ変換する | tasksの実装ごと |
@@ -52,12 +52,13 @@ requirements.mdの各要求は、曖昧な自然文ではなく EARS (Easy Appro
 
 ## ディレクトリ規約
 
-- `.agents/sdd/`: SDDの手法、constitution・templates・このREADMEを持つ。
+- `.agents/sdd/`: SDDの手法、templates・このREADMEを持つ。
 - `docs/project-requirements.md`: 全体要件、FR/NFR台帳、対応状態（フォーク先で作成する）。
+- `docs/constitution.md`: 全機能に共通するプロジェクト固有の原則。
 - `.agents/skills/sdd-*/`: AgentがSDDを実行するcanonical Skill。
 - `docs/specs/<feature>/`: specify/plan/tasksの出力先。1機能につき1ディレクトリ。
 
-SDDの実行方法は `.agents/`、全体要件と機能別成果物は `docs/` に置く。constitutionは既存の単一ファイルを使い、人間がレビューする。
+SDDの実行方法は `.agents/`、全体要件・constitution・機能別成果物は `docs/` に置く。constitutionはプロジェクトに1つ置き、人間がレビューする。
 
 ## 既存の仕組みとの役割分担
 
@@ -74,7 +75,7 @@ SDDの実行方法は `.agents/`、全体要件と機能別成果物は `docs/` 
 | Skill | 出力 | 実体 |
 |---|---|---|
 | `sdd-project-requirements` | `docs/project-requirements.md` | `.agents/skills/sdd-project-requirements/SKILL.md` |
-| `sdd-constitution` | `.agents/sdd/constitution.md` | `.agents/skills/sdd-constitution/SKILL.md` |
+| `sdd-constitution` | `docs/constitution.md` | `.agents/skills/sdd-constitution/SKILL.md` |
 | `sdd-specify` | `docs/specs/<feature>/requirements.md` | `.agents/skills/sdd-specify/SKILL.md` |
 | `sdd-plan` | `docs/specs/<feature>/design.md` | `.agents/skills/sdd-plan/SKILL.md` |
 | `sdd-tasks` | `docs/specs/<feature>/tasks.md` | `.agents/skills/sdd-tasks/SKILL.md` |
