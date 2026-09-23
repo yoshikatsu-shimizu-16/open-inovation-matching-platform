@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"$(git rev-parse --show-toplevel)\" && npm run harness:verify -- --hook",
+            "command": "node .codex/stop-harness-json.mjs",
             "timeout": 1200,
             "statusMessage": "Running repository harness verification"
           }

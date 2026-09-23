@@ -71,7 +71,7 @@ harnesses:
   - { id: H057, category: knowledge, name: knowledge-base-mechanical-check, priority: P1, source: "OpenAI Harness Engineering", purpose: "docs構造・導線・鮮度をスクリプト/CIで機械検査する" }
 
   # Spec-Driven Development / Loop Engineering から具体的に追加した項目
-  - { id: H058, category: spec-driven-development, name: constitution-before-spec, priority: P1, source: "AWS Kiro / GitHub Spec Kit", purpose: "プロジェクト全体の不可侵原則を機能仕様より先に、1回だけ固定する" }
+  - { id: H058, category: spec-driven-development, name: project-requirements-and-constitution-before-spec, priority: P1, source: "AWS Kiro / GitHub Spec Kit", purpose: "全体要件のFR/NFR台帳と共通原則をレビューしてからアプリ機能仕様を作る" }
   - { id: H059, category: spec-driven-development, name: ears-requirements-format, priority: P1, source: "EARS (Mavin et al.)", purpose: "要求を曖昧な自然文ではなく構造化された記法で書く" }
   - { id: H060, category: spec-driven-development, name: staged-spec-review-gate, priority: P1, source: "AWS Kiro / GitHub Spec Kit", purpose: "requirements→design→tasksの各段階を、次へ進む前にレビューする" }
   - { id: H061, category: spec-driven-development, name: spec-consistency-analyze-gate, priority: P1, source: "GitHub Spec Kit", purpose: "requirements/design/tasksとconstitutionの整合性を実装前に機械的に確認する" }

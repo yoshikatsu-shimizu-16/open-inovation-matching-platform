@@ -1,6 +1,6 @@
 ---
 name: sdd-specify
-description: 機能要求をEARS形式のrequirements.mdへ変換する。ユーザー可視の振る舞いを持つ新機能に着手する時、実装より先に使う。
+description: 全体要件とconstitutionの人間レビュー後、FR/NFRに対応する機能要求をEARS形式のrequirements.mdへ変換する。
 ---
 
 このスキルの実体は `.agents/skills/sdd-specify/SKILL.md` にある(Agent Skills open

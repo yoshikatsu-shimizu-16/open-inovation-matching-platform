@@ -29,6 +29,7 @@ run_if_script_exists() {
 # Harnessの全検証ゲートを標準モードで順番に実行する。
 run_harness() (
   set -euo pipefail
+  local spec_mode="${1:---stage}"
 
   echo "=== Harness verification start ==="
 
@@ -41,7 +42,9 @@ run_harness() (
   if [[ -f "$CHECKS_DIR/spec-check.sh" ]]; then
     echo
     echo "==> spec-check (docs/specs/ review, requirement traceability, task verification fields)"
-    bash "$CHECKS_DIR/spec-check.sh"
+    bash "$CHECKS_DIR/spec-check.sh" "$spec_mode"
+    echo "==> spec-check regression tests"
+    node --test "$SCRIPT_DIR/tests/spec-check.test.mjs"
   fi
 
   if [[ -f "$CHECKS_DIR/source-layout-check.mjs" ]]; then
@@ -93,7 +96,7 @@ run_hook_mode() {
   local status
 
   log_file="$(mktemp)"
-  run_harness 2>&1 | tee "$log_file"
+  run_harness --stage 2>&1 | tee "$log_file"
   status="${PIPESTATUS[0]}"
 
   if (( status != 0 )); then
@@ -121,9 +124,12 @@ case "${1:-}" in
   --hook)
     run_hook_mode
     ;;
+  --spec-complete)
+    run_harness --complete
+    ;;
   *)
     echo "ERROR: unknown harness mode: $1" >&2
-    echo "usage: $0 [--hook]" >&2
+    echo "usage: $0 [--hook|--spec-complete]" >&2
     exit 64
     ;;
 esac

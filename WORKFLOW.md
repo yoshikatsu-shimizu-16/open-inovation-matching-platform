@@ -34,9 +34,10 @@ AI開発基盤の内部実装は `.agents/` に閉じ込め、通常のアプリ
 2. `ARCHITECTURE.md` を読む。
 3. Application Development Mode / Kit Maintenance Mode のどちらかを明確にする。通常はApplication Development Mode。
 4. `git status` と最近の履歴を確認する。
-5. `.agents/sdd/constitution.md` を読む。
-6. 関係する既存の `docs/specs/`、design docs、`.agents/profiles/` を読む。
-7. タスクの目的、acceptance criteria、risk boundaryを整理する。
+5. アプリ機能を扱う場合は `docs/project-requirements.md` のFR/NFR台帳とレビュー状態を確認する。
+6. `.agents/sdd/constitution.md` を読む。
+7. 関係する既存の `docs/specs/`、design docs、`.agents/profiles/` を読む。
+8. タスクの目的、acceptance criteria、risk boundaryを整理する。
 
 ## Specify before implementation
 
@@ -44,6 +45,10 @@ AI開発基盤の内部実装は `.agents/` に閉じ込め、通常のアプリ
 
 ```text
 Intent
+  ↓
+project requirements (FR/NFR) → human review
+  ↓
+constitution → human review
   ↓
 requirements.md
   ↓ human review
@@ -56,7 +61,9 @@ requirements.md
 Implementation
 ```
 
-- `.agents/skills/sdd-specify` で requirements を作る。
+- `.agents/skills/sdd-project-requirements` で全体要件とFR/NFR台帳を作り、人間レビューを受ける。
+- `.agents/skills/sdd-constitution` で共通原則を作り、人間レビューを受ける。
+- `.agents/skills/sdd-specify` で対応するFR/NFRに紐づく機能別requirementsを作る。
 - requirements の人間レビュー後に `.agents/skills/sdd-plan` で design を作る。
 - design の人間レビュー後に `.agents/skills/sdd-tasks` で実装タスクへ分解する。
 - tasks の人間レビュー後に `.agents/skills/sdd-analyze` で整合性を確認する。

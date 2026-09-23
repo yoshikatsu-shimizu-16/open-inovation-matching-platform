@@ -20,6 +20,7 @@ required=(
   "$HARNESS_DIR/harness-verify-orchestrator.sh"
   "$CHECKS_DIR/knowledge-base-check.sh"
   "$CHECKS_DIR/spec-check.sh"
+  "$HARNESS_DIR/tests/spec-check.test.mjs"
   "$CHECKS_DIR/source-layout-check.mjs"
   "$HARNESS_DIR/setup/bootstrap.sh"
   ".claude/settings.json"
@@ -110,7 +111,7 @@ fi
 
 # SDD skillは各Agentが実際に探索する場所
 # (.agents/skills/ for Codex etc., .claude/skills/ for Claude Code) に配置する。
-for skill in sdd-specify sdd-plan sdd-tasks sdd-analyze; do
+for skill in sdd-project-requirements sdd-constitution sdd-specify sdd-plan sdd-tasks sdd-analyze; do
   agents_file=".agents/skills/${skill}/SKILL.md"
   claude_file=".claude/skills/${skill}/SKILL.md"
   for f in "$agents_file" "$claude_file"; do
@@ -138,12 +139,19 @@ for hook_file in .claude/settings.json .codex/hooks.json; do
     echo "ERROR: Stop hook missing from $hook_file"
     exit 1
   fi
-
-  if ! grep -F 'npm run harness:verify -- --hook' "$hook_file" >/dev/null; then
-    echo "ERROR: $hook_file must delegate to npm run harness:verify -- --hook"
-    exit 1
-  fi
 done
+
+if ! grep -F 'npm run harness:verify -- --hook' .claude/settings.json >/dev/null; then
+  echo "ERROR: .claude/settings.json must delegate to npm run harness:verify -- --hook"
+  exit 1
+fi
+
+# CodexのStop HookはstdoutがJSON専用。npmのログを隔離するwrapper経由で検証する。
+if ! grep -F 'node .codex/stop-harness-json.mjs' .codex/hooks.json >/dev/null ||
+   ! grep -F 'spawnSync("npm", ["run", "harness:verify", "--", "--hook"]' .codex/stop-harness-json.mjs >/dev/null; then
+  echo "ERROR: .codex/hooks.json must delegate to npm run harness:verify -- --hook through its JSON wrapper"
+  exit 1
+fi
 
 if ! grep -F 'hooks = true' .codex/config.toml >/dev/null; then
   echo "ERROR: .codex/config.toml must enable lifecycle hooks"
@@ -162,6 +170,7 @@ NODE
 bash -n "$HARNESS_DIR/harness-verify-orchestrator.sh"
 bash -n "$CHECKS_DIR/knowledge-base-check.sh"
 bash -n "$CHECKS_DIR/spec-check.sh"
+node --check "$HARNESS_DIR/tests/spec-check.test.mjs"
 bash -n "$HARNESS_DIR/setup/bootstrap.sh"
 node --check "$CHECKS_DIR/source-layout-check.mjs"
 

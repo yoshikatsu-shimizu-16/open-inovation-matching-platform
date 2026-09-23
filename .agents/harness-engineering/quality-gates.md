@@ -6,7 +6,7 @@
 ## Gate 0: Context
 - `AGENTS.md`、関連する`.agents/standards/`、`.agents/profiles/`、Task Contractを確認する。
 - 目的、Done条件、本番影響が不明なら実装前に整理する。
-- spec駆動の機能追加では、Harness内部の `.agents/scripts/harness/checks/spec-check.sh` が `docs/specs/<feature>/` のrequirements/design/tasksについて、レビュー済み・要求IDのtraceability・taskごとの`checks`フィールドを機械検査する。
+- spec駆動の機能追加では、通常のHarnessが現在作成済みの段階とレビュー順序を検査する。`sdd-analyze` では `npm run harness:verify -- --spec-complete` を使い、requirements/design/tasksの存在・レビュー済み・要求IDのtraceability・taskごとの`checks`フィールドを完全検査する。
 - その上で `sdd-analyze`スキル(実体: `.agents/skills/sdd-analyze/SKILL.md`)のセマンティックな整合性チェックを行う。
 
 ## Gate 1: Static

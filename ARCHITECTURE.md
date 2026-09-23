@@ -126,7 +126,9 @@ Loop Engineeringの制御層は `.agents/loop-engineering/` と `.agents/templat
 ```text
 Fork
   ↓
-Project intent / constitution
+Project requirements (FR/NFR) / human review
+  ↓
+Constitution / human review
   ↓
 Feature requirements
   ↓
@@ -152,7 +154,7 @@ Evidence-based handoff
 - `.agents/profiles/` は技術固有の制約だけを持つ。
 - `.agents/harness-engineering/` は standards / profiles を検証可能なquality gateへ落とす。
 - `.agents/sdd/` と `.agents/skills/` は機能要求から実装計画までを型化する。
-- `docs/specs/` はフォーク先アプリの機能仕様のsource of truthとなる。
+- `docs/project-requirements.md` は全体要件と対応状態、`docs/specs/` は機能別仕様のsource of truthとなる。
 - `frontend/`・`backend/`・`infrastructure/` はspec/designに従って変更する。
 - `.agents/scripts/` はAI開発基盤の重要な不変条件を可能な限り機械的に検証する。
 - `.agents/examples/` は参考資料であり、アプリ仕様や標準のsource of truthにはしない。

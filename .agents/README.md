@@ -48,7 +48,9 @@
 ## SDD
 
 - 実行方法: `.agents/skills/sdd-*` と `.agents/sdd/`
-- 成果物: `docs/specs/<feature>/requirements.md`、`design.md`、`tasks.md`
+- 全体要件: `docs/project-requirements.md`（`sdd-project-requirements`で作成）
+- 共通原則: `.agents/sdd/constitution.md`（`sdd-constitution`で作成）
+- 機能別成果物: `docs/specs/<feature>/requirements.md`、`design.md`、`tasks.md`
 
 ## Harness Engineering
 
