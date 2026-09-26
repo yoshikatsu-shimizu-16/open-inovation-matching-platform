@@ -1,5 +1,5 @@
 ---
-workflow_version: 3
+workflow_version: 4
 handoff_state: human-review
 max_scope: one-task
 ---
@@ -95,6 +95,24 @@ Implementation
 - 実装と同時に必要なテストを追加または更新する。
 - アプリ固有の事情だけで `.agents/standards/` や `.agents/harness-engineering/` を緩めない。
 - 繰り返す失敗が共通的な不足を示した場合は、別途Kit MaintenanceとしてHarness改善を検討する。
+
+## Pull requests
+
+Pull Request は人間が変更目的とレビュー対象を一覧で判断するための境界として扱う。AI Coding Agent がPRを作成・更新する場合も次の命名規則に従う。
+
+- PRタイトルは原則として `<type>: <日本語の変更概要>` とする。
+- `<type>` は変更種別を表す短い英小文字の識別子とし、`feat`、`fix`、`spec`、`mockup`、`docs`、`refactor`、`test`、`chore`、`kit`、`ci`、`build` などを使用する。
+- コロン以降の変更概要は日本語で記述し、PR一覧だけで何を変更するPRか判断できる具体的な内容にする。製品名、API名、Feature ID、技術用語などは必要に応じて英語表記のままでよい。
+- `update files`、`fix issue`、`changes` のように変更対象や目的が分からない曖昧なタイトルを使用しない。
+- 1つのPRには1つの明確な目的を持たせ、タイトルはその目的を表す。レビュー中にスコープや目的が変わった場合はタイトルも更新する。
+- この規則は Application Development Mode と Kit Maintenance Mode の両方に適用する。
+
+例:
+
+- `spec: 相談開始の縦切り仕様を定義`
+- `mockup: 相談・課題明確化フローのモックを追加`
+- `kit: SPECディレクトリに固定Feature IDを導入`
+- `fix: 相談開始失敗時に入力内容が消える不具合を修正`
 
 ## Verify
 
