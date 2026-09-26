@@ -13,12 +13,12 @@ description: レビュー済みのrequirements.mdとdesign.mdから実装タス�
 ## Inputs
 
 - `docs/specs/<feature-slug>/requirements.md`
-- `docs/specs/<feature-slug>/design.md`(`## Review`にチェックが入っていること)
+- `docs/specs/<feature-slug>/design.md`(`## Review` が `Status: reviewed` でPR証跡を持つこと)
 - `.agents/harness-engineering/task-contract-template.md`(各タスクの粒度の基準)
 
 ## Steps
 
-1. `design.md`がレビュー済みであることを確認する。未レビューなら止めて`sdd-plan`へ差し戻す。
+1. `design.md`のReview metadataが `Status: reviewed` であることを確認する。未レビューなら止めて`sdd-plan`へ差し戻す。
 2. `.agents/sdd/templates/tasks.template.md`を
    `docs/specs/<feature-slug>/tasks.md`へコピーする。
 3. design.mdのRequirements traceability表を基に、実装タスクへ分解する。
@@ -28,10 +28,11 @@ description: レビュー済みのrequirements.mdとdesign.mdから実装タス�
 5. 各タスクに `checks`(`.agents/harness-engineering/verification-matrix.md`の変更種別に対応する検証。
    typecheck/lint/unit/runtime/integration/e2e/build)を明記する。1つも書かないことは認めない。
    対象外なら `checks: N/A(理由)` と書く。
+6. tasks.md の `## Review` は `Status: pending` のまま人間レビュー用PRへ出す。既存のレビュー済みtasksを実質変更する場合もpendingへ戻す。
 
 ## Stop condition
 
-- `## Review`にチェックが入るまで、`sdd-analyze`スキル・実装へは進まない。
+- tasks用PRが人間にMergeされ、`.github/workflows/sdd-review-evidence.yml` により `## Review` が `Status: reviewed`、`Evidence: PR #N` へ同期されるまで `sdd-analyze` スキル・実装へは進まない。
 
 ## Boundary
 
