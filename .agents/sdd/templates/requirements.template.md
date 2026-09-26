@@ -51,4 +51,7 @@ EARSの英語キーワードは文章本文ではなく構文ラベルとして�
 
 ## Review
 
-- [ ] レビュー済み(この状態になってから `plan` スキルへ進む)
+- Status: pending
+- Evidence: —
+- Reviewed at: —
+- Reviewed by: —
