@@ -36,4 +36,7 @@ Client -> Route -> Service -> Repository/Storage
 
 ## Review
 
-- [ ] レビュー済み(この状態になってから `tasks` スキルへ進む)
+- Status: pending
+- Evidence: —
+- Reviewed at: —
+- Reviewed by: —

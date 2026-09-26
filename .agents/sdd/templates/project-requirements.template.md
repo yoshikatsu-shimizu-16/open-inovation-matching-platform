@@ -31,4 +31,7 @@ IDは `FR-001`（機能）と `NFR-001`（非機能）を別系列で採番す�
 
 ## Review
 
-- [ ] レビュー済み
+- Status: pending
+- Evidence: —
+- Reviewed at: —
+- Reviewed by: —

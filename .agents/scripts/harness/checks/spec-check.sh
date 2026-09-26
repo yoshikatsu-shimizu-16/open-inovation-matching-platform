@@ -27,6 +27,34 @@ if [[ "$mode" != "--stage" && "$mode" != "--complete" ]]; then
   exit 64
 fi
 
+# ## Review セクションだけを取り出す。本文や例示に同じmetadata文字列があっても
+# レビュー済みと誤判定しないため、すべてのReview判定はこの範囲に限定する。
+# 既存forkで使われていた `## Review（レビュー）` も移行互換として認識する。
+review_section() {
+  local file="$1"
+  awk '
+    /^## Review(（レビュー）)?[[:space:]]*$/ { in_review = 1; next }
+    in_review && /^##[[:space:]]/ { exit }
+    in_review { print }
+  ' "$file"
+}
+
+# 新しい成果物はReview metadataを使う。既存forkの移行互換性のため、
+# 旧 `- [x] レビュー済み` もReviewセクション内に限って読み取りを許容する。
+is_reviewed_file() {
+  local file="$1"
+  local section
+  section="$(review_section "$file")"
+
+  if printf '%s\n' "$section" | grep -qE '^\s*-\s*Status:\s*reviewed\s*$' \
+    && printf '%s\n' "$section" | grep -qE '^\s*-\s*Evidence:\s*PR #[0-9]+\s*$' \
+    && printf '%s\n' "$section" | grep -qE '^\s*-\s*Reviewed at:\s*[0-9]{4}-[0-9]{2}-[0-9]{2}T[^[:space:]]+\s*$' \
+    && printf '%s\n' "$section" | grep -qE '^\s*-\s*Reviewed by:\s*@[^[:space:]]+\s*$'; then
+    return 0
+  fi
+  printf '%s\n' "$section" | grep -qE '^\s*-\s*\[x\]\s*レビュー済み'
+}
+
 # スターター由来の既存2件は、全体要件導入前にレビューされた移行例外。
 # 新しいアプリ機能SPECが1件でも存在する場合は、全体要件とconstitutionを必須にする。
 active_features=()
@@ -50,8 +78,32 @@ const errors = [];
 const exists = fs.existsSync(projectPath);
 const project = exists ? fs.readFileSync(projectPath, "utf8") : "";
 const constitution = fs.readFileSync(constitutionPath, "utf8");
-const reviewed = (s) => /^\s*-\s*\[x\]\s*レビュー済み/m.test(s);
-const unfinished = (s) => /<[^>\n]+>|ここにプロジェクト固有|\(例:|\*\*singleton \/ template\*\*|記入例（採用する場合/.test(s);
+
+const reviewSection = (source) => source.split(/^## Review(?:（レビュー）)?\s*$/m)[1]?.split(/^## /m)[0] ?? "";
+const reviewMetadata = (source) => {
+  const section = reviewSection(source);
+  const field = (name) => new RegExp(`^\\s*-\\s*${name}:\\s*(.*?)\\s*$`, "mi").exec(section)?.[1]?.trim();
+  return {
+    status: field("Status")?.toLowerCase(),
+    evidence: field("Evidence"),
+    reviewedAt: field("Reviewed at"),
+    reviewedBy: field("Reviewed by"),
+  };
+};
+const legacyReviewed = (source) => /^\s*-\s*\[x\]\s*レビュー済み/m.test(reviewSection(source));
+const reviewed = (source) => reviewMetadata(source).status === "reviewed" || legacyReviewed(source);
+const validReviewEvidence = (source) => {
+  const metadata = reviewMetadata(source);
+  if (metadata.status !== "reviewed") return legacyReviewed(source);
+  return (
+    /^PR #\d+$/.test(metadata.evidence ?? "") &&
+    /^\d{4}-\d{2}-\d{2}T\S+$/.test(metadata.reviewedAt ?? "") &&
+    /^@\S+$/.test(metadata.reviewedBy ?? "")
+  );
+};
+const unfinished = (source) =>
+  /ここにプロジェクト固有|\(例:|\*\*singleton \/ template\*\*|記入例（採用する場合|<project>|<未記入>|<解決する課題|<主要業務フロー|<利用者に提供|<品質・安全|<段階>|<ID>|<理由と影響>|<確認者または未レビュー>|<全体要件のレビュー後/.test(source);
+const normalizeSpecSlug = (value) => value.trim().replace(/^`([^`]+)`$/, "$1");
 const rows = new Map();
 
 if (features.length && !exists) errors.push(`missing ${projectPath} before application feature specs`);
@@ -67,7 +119,7 @@ if (exists) {
       errors.push(`verified ${id} needs completion date and evidence`);
     }
     if (spec && spec !== "—") {
-      for (const slug of spec.split(",").map((value) => value.trim())) {
+      for (const slug of spec.split(",").map(normalizeSpecSlug)) {
         if (!fs.existsSync(path.join("docs/specs", slug, "requirements.md"))) errors.push(`${id} refers to missing spec ${slug}`);
       }
     }
@@ -79,12 +131,14 @@ if (exists) {
     });
   }
   if (reviewed(project)) {
+    if (!validReviewEvidence(project)) errors.push("reviewed project requirements need valid Review evidence metadata");
     if (!rows.size || ![...rows.keys()].some((id) => id.startsWith("FR-")) || ![...rows.keys()].some((id) => id.startsWith("NFR-"))) errors.push("reviewed project requirements need FR and NFR rows");
     if (unfinished(project)) errors.push("reviewed project requirements still contain template placeholders");
   }
 }
+if (reviewed(constitution) && !validReviewEvidence(constitution)) errors.push("reviewed constitution needs valid Review evidence metadata");
 if (reviewed(constitution) && !reviewed(project)) errors.push("constitution cannot be reviewed before project requirements");
-if (reviewed(constitution) && unfinished(constitution)) errors.push("reviewed constitution still contains template placeholders");
+if (reviewed(constitution) && unfinished(constitution)) errors.push("reviewed constitution still contain template placeholders");
 
 if (features.length) {
   if (!reviewed(project)) errors.push("project requirements must be human-reviewed before feature specs");
@@ -102,7 +156,7 @@ for (const feature of features) {
     const row = rows.get(id);
     if (!row) errors.push(`[${feature}] unknown parent ${id}`);
     else if (row.status === "取り下げ") errors.push(`[${feature}] withdrawn parent ${id}`);
-    else if (!(row.spec ?? "").split(",").map((v) => v.trim()).includes(feature)) errors.push(`[${feature}] ${id} register does not refer back to this spec`);
+    else if (!(row.spec ?? "").split(",").map(normalizeSpecSlug).includes(feature)) errors.push(`[${feature}] ${id} register does not refer back to this spec`);
   }
 }
 for (const error of errors) console.error(`ERROR: [project-spec] ${error}`);
@@ -136,12 +190,12 @@ for feature_dir in "$specs_dir"/*/; do
   req_reviewed=0
   design_reviewed=0
   tasks_reviewed=0
-  grep -qE '^\s*-\s*\[x\]\s*レビュー済み' "$req" && req_reviewed=1
-  [[ -f "$design" ]] && grep -qE '^\s*-\s*\[x\]\s*レビュー済み' "$design" && design_reviewed=1
-  [[ -f "$tasks" ]] && grep -qE '^\s*-\s*\[x\]\s*レビュー済み' "$tasks" && tasks_reviewed=1
+  is_reviewed_file "$req" && req_reviewed=1
+  [[ -f "$design" ]] && is_reviewed_file "$design" && design_reviewed=1
+  [[ -f "$tasks" ]] && is_reviewed_file "$tasks" && tasks_reviewed=1
 
   if [[ -f "$design" && $req_reviewed -eq 0 ]]; then
-    echo "ERROR: [$feature] design.md exists before requirements.md is marked reviewed"
+    echo "ERROR: [$feature] design.md exists before requirements.md is reviewed"
     status=1
   fi
 
@@ -149,7 +203,7 @@ for feature_dir in "$specs_dir"/*/; do
     echo "ERROR: [$feature] tasks.md exists without design.md"
     status=1
   elif [[ -f "$tasks" && $design_reviewed -eq 0 ]]; then
-    echo "ERROR: [$feature] tasks.md exists before design.md is marked reviewed"
+    echo "ERROR: [$feature] tasks.md exists before design.md is reviewed"
     status=1
   fi
 
@@ -158,8 +212,8 @@ for feature_dir in "$specs_dir"/*/; do
       if [[ ! -f "$f" ]]; then
         echo "ERROR: [$feature] missing $f"
         status=1
-      elif ! grep -qE '^\s*-\s*\[x\]\s*レビュー済み' "$f"; then
-        echo "ERROR: [$feature] $(basename "$f") is not marked reviewed (## Review checkbox unchecked)"
+      elif ! is_reviewed_file "$f"; then
+        echo "ERROR: [$feature] $(basename "$f") is not reviewed (Review metadata is incomplete or pending)"
         status=1
       fi
     done

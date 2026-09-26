@@ -24,4 +24,7 @@ integration/e2e/build)をカンマ区切りで明記する。該当しない検�
 
 ## Review
 
-- [ ] レビュー済み(この状態になってから `analyze` スキル→`implement`へ進む)
+- Status: pending
+- Evidence: —
+- Reviewed at: —
+- Reviewed by: —
