@@ -24,6 +24,13 @@ description: 全体要件とconstitutionの人間レビュー後、FR/NFRに対�
 - 旧形式の番号なしディレクトリが存在する場合、暗黙に番号を付け替えない。移行は明示的な変更として扱い、参照元も同時に更新する。
 - `docs/project-requirements.md` の「対応SPEC」欄には、Feature IDを含む完全なディレクトリ名（例: `F001-consultation-start`）を記録する。
 
+## Human-readable requirements format
+
+- User Storyは `As a ... I want ... so that ...` を日本語文章へ混在させず、`利用者` / `やりたいこと` / `目的` の項目に分ける。
+- EARSの `WHEN` / `WHILE` / `IF` / `THEN THE SYSTEM SHALL` / `WHERE` / `THE SYSTEM SHALL` は英語の構文ラベルとして残す。
+- EARSキーワードと日本語本文を一文に連結せず、条件・状態とシステム応答を別行の項目として表示する。
+- 英語キーワードは仕様記法の構造を示すためのラベルであり、利用者が読む説明文は日本語を基本とする。
+
 ## When to use
 
 - ユーザー可視の振る舞いや、API/データ契約の変更を伴う新機能に着手する時。
@@ -47,8 +54,8 @@ description: 全体要件とconstitutionの人間レビュー後、FR/NFRに対�
 5. `docs/specs/` 直下の既存Feature IDを確認し、Feature ID naming ruleに従って次の `<feature-id>` を決める。
 6. `docs/specs/<feature-id>-<feature-slug>/`ディレクトリを作る。
 7. `.agents/sdd/templates/requirements.template.md`を `docs/specs/<feature-id>-<feature-slug>/requirements.md`へコピーし、Feature ID・slug・出力先を埋める。
-8. Overview、User storiesを埋める。
-9. Requirementsを EARS記法(`.agents/sdd/README.md`の早見表)で書く。曖昧な自然文のままにしない。各要求に`REQ-001`のような安定したIDを付ける (`design.md`のtraceability表・`tasks.md`の`verifies`から参照される)。
+8. Overview、User storiesを埋める。User Storyは `利用者` / `やりたいこと` / `目的` の項目形式にする。
+9. Requirementsを EARS記法(`.agents/sdd/README.md`の早見表)で書く。EARSキーワードは構文ラベルとして別行に置き、日本語本文へ埋め込まない。各要求に`REQ-001`のような安定したIDを付ける (`design.md`のtraceability表・`tasks.md`の`verifies`から参照される)。
 10. Out of scopeを明記し、後続ループへ送る機能と依存関係を混入させない。
 11. Constitution alignmentで、constitution.mdのどの原則と関連するかを書く。
 12. `docs/project-requirements.md` の「対応SPEC」欄をFeature ID付きディレクトリ名へ更新し、requirements側のParent requirementsとの相互参照を確認する。

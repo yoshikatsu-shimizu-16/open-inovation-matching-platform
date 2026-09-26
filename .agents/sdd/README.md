@@ -57,6 +57,22 @@ requirements.mdの各要求は、曖昧な自然文ではなく EARS (Easy Appro
 | Unwanted Behavior(異常系) | IF <condition> THEN THE SYSTEM SHALL <response> |
 | Optional Feature(任意機能) | WHERE <feature is present> THE SYSTEM SHALL <response> |
 
+### requirements.mdでの可読性ルール
+
+EARSの英語キーワードは構文を示す**ラベル**として残すが、日本語本文の途中には埋め込まない。人間レビューでは、条件・状態・システム応答が区別できるよう別行で記述する。
+
+```markdown
+- [ ] REQ-001
+  - WHEN: 相談開始画面を表示する
+  - THE SYSTEM SHALL: 相談内容を自由記述できる入力欄を表示する
+
+- [ ] REQ-002
+  - IF: 相談内容が未入力である
+  - THEN THE SYSTEM SHALL: 入力が必要であることを表示する
+```
+
+この表記はEARSの意味を変えるものではなく、`WHEN ... THE SYSTEM SHALL ...` 等の構文要素を視覚的に分離したものである。
+
 ## ディレクトリ規約
 
 - `.agents/sdd/`: SDDの手法、templates・このREADMEを持つ。
