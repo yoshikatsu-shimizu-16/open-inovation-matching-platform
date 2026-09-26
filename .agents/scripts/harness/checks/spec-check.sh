@@ -85,7 +85,9 @@ const validReviewEvidence = (source) => {
     /^@\S+$/.test(metadata.reviewedBy ?? "")
   );
 };
-const unfinished = (source) => /<[^>\n]+>|ここにプロジェクト固有|\(例:|\*\*singleton \/ template\*\*|記入例（採用する場合/.test(source);
+const unfinished = (source) =>
+  /ここにプロジェクト固有|\(例:|\*\*singleton \/ template\*\*|記入例（採用する場合|<project>|<未記入>|<解決する課題|<主要業務フロー|<利用者に提供|<品質・安全|<段階>|<ID>|<理由と影響>|<確認者または未レビュー>|<全体要件のレビュー後/.test(source);
+const normalizeSpecSlug = (value) => value.trim().replace(/^`([^`]+)`$/, "$1");
 const rows = new Map();
 
 if (features.length && !exists) errors.push(`missing ${projectPath} before application feature specs`);
@@ -101,7 +103,7 @@ if (exists) {
       errors.push(`verified ${id} needs completion date and evidence`);
     }
     if (spec && spec !== "—") {
-      for (const slug of spec.split(",").map((value) => value.trim())) {
+      for (const slug of spec.split(",").map(normalizeSpecSlug)) {
         if (!fs.existsSync(path.join("docs/specs", slug, "requirements.md"))) errors.push(`${id} refers to missing spec ${slug}`);
       }
     }
@@ -138,7 +140,7 @@ for (const feature of features) {
     const row = rows.get(id);
     if (!row) errors.push(`[${feature}] unknown parent ${id}`);
     else if (row.status === "取り下げ") errors.push(`[${feature}] withdrawn parent ${id}`);
-    else if (!(row.spec ?? "").split(",").map((v) => v.trim()).includes(feature)) errors.push(`[${feature}] ${id} register does not refer back to this spec`);
+    else if (!(row.spec ?? "").split(",").map(normalizeSpecSlug).includes(feature)) errors.push(`[${feature}] ${id} register does not refer back to this spec`);
   }
 }
 for (const error of errors) console.error(`ERROR: [project-spec] ${error}`);
