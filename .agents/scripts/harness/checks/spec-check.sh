@@ -29,10 +29,11 @@ fi
 
 # ## Review セクションだけを取り出す。本文や例示に同じmetadata文字列があっても
 # レビュー済みと誤判定しないため、すべてのReview判定はこの範囲に限定する。
+# 既存forkで使われていた `## Review（レビュー）` も移行互換として認識する。
 review_section() {
   local file="$1"
   awk '
-    /^## Review[[:space:]]*$/ { in_review = 1; next }
+    /^## Review(（レビュー）)?[[:space:]]*$/ { in_review = 1; next }
     in_review && /^##[[:space:]]/ { exit }
     in_review { print }
   ' "$file"
@@ -78,7 +79,7 @@ const exists = fs.existsSync(projectPath);
 const project = exists ? fs.readFileSync(projectPath, "utf8") : "";
 const constitution = fs.readFileSync(constitutionPath, "utf8");
 
-const reviewSection = (source) => source.split(/^## Review\s*$/m)[1]?.split(/^## /m)[0] ?? "";
+const reviewSection = (source) => source.split(/^## Review(?:（レビュー）)?\s*$/m)[1]?.split(/^## /m)[0] ?? "";
 const reviewMetadata = (source) => {
   const section = reviewSection(source);
   const field = (name) => new RegExp(`^\\s*-\\s*${name}:\\s*(.*?)\\s*$`, "mi").exec(section)?.[1]?.trim();
