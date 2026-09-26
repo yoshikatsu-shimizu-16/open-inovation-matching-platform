@@ -27,17 +27,31 @@ if [[ "$mode" != "--stage" && "$mode" != "--complete" ]]; then
   exit 64
 fi
 
+# ## Review セクションだけを取り出す。本文や例示に同じmetadata文字列があっても
+# レビュー済みと誤判定しないため、すべてのReview判定はこの範囲に限定する。
+review_section() {
+  local file="$1"
+  awk '
+    /^## Review[[:space:]]*$/ { in_review = 1; next }
+    in_review && /^##[[:space:]]/ { exit }
+    in_review { print }
+  ' "$file"
+}
+
 # 新しい成果物はReview metadataを使う。既存forkの移行互換性のため、
-# 旧 `- [x] レビュー済み` も読み取りだけは許容する。
+# 旧 `- [x] レビュー済み` もReviewセクション内に限って読み取りを許容する。
 is_reviewed_file() {
   local file="$1"
-  if grep -qE '^\s*-\s*Status:\s*reviewed\s*$' "$file" \
-    && grep -qE '^\s*-\s*Evidence:\s*PR #[0-9]+\s*$' "$file" \
-    && grep -qE '^\s*-\s*Reviewed at:\s*[0-9]{4}-[0-9]{2}-[0-9]{2}T[^[:space:]]+\s*$' "$file" \
-    && grep -qE '^\s*-\s*Reviewed by:\s*@[^[:space:]]+\s*$' "$file"; then
+  local section
+  section="$(review_section "$file")"
+
+  if printf '%s\n' "$section" | grep -qE '^\s*-\s*Status:\s*reviewed\s*$' \
+    && printf '%s\n' "$section" | grep -qE '^\s*-\s*Evidence:\s*PR #[0-9]+\s*$' \
+    && printf '%s\n' "$section" | grep -qE '^\s*-\s*Reviewed at:\s*[0-9]{4}-[0-9]{2}-[0-9]{2}T[^[:space:]]+\s*$' \
+    && printf '%s\n' "$section" | grep -qE '^\s*-\s*Reviewed by:\s*@[^[:space:]]+\s*$'; then
     return 0
   fi
-  grep -qE '^\s*-\s*\[x\]\s*レビュー済み' "$file"
+  printf '%s\n' "$section" | grep -qE '^\s*-\s*\[x\]\s*レビュー済み'
 }
 
 # スターター由来の既存2件は、全体要件導入前にレビューされた移行例外。
@@ -64,8 +78,9 @@ const exists = fs.existsSync(projectPath);
 const project = exists ? fs.readFileSync(projectPath, "utf8") : "";
 const constitution = fs.readFileSync(constitutionPath, "utf8");
 
+const reviewSection = (source) => source.split(/^## Review\s*$/m)[1]?.split(/^## /m)[0] ?? "";
 const reviewMetadata = (source) => {
-  const section = source.split(/^## Review\s*$/m)[1]?.split(/^## /m)[0] ?? "";
+  const section = reviewSection(source);
   const field = (name) => new RegExp(`^\\s*-\\s*${name}:\\s*(.*?)\\s*$`, "mi").exec(section)?.[1]?.trim();
   return {
     status: field("Status")?.toLowerCase(),
@@ -74,7 +89,7 @@ const reviewMetadata = (source) => {
     reviewedBy: field("Reviewed by"),
   };
 };
-const legacyReviewed = (source) => /^\s*-\s*\[x\]\s*レビュー済み/m.test(source);
+const legacyReviewed = (source) => /^\s*-\s*\[x\]\s*レビュー済み/m.test(reviewSection(source));
 const reviewed = (source) => reviewMetadata(source).status === "reviewed" || legacyReviewed(source);
 const validReviewEvidence = (source) => {
   const metadata = reviewMetadata(source);
@@ -122,7 +137,7 @@ if (exists) {
 }
 if (reviewed(constitution) && !validReviewEvidence(constitution)) errors.push("reviewed constitution needs valid Review evidence metadata");
 if (reviewed(constitution) && !reviewed(project)) errors.push("constitution cannot be reviewed before project requirements");
-if (reviewed(constitution) && unfinished(constitution)) errors.push("reviewed constitution still contains template placeholders");
+if (reviewed(constitution) && unfinished(constitution)) errors.push("reviewed constitution still contain template placeholders");
 
 if (features.length) {
   if (!reviewed(project)) errors.push("project requirements must be human-reviewed before feature specs");
