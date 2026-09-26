@@ -5,6 +5,7 @@ import { spawnSync } from "node:child_process";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
+  isReviewableContent,
   isReviewablePath,
   syncReviewMetadata,
 } from "../../sdd/sync-review-metadata.mjs";
@@ -126,4 +127,8 @@ test("review対象パスだけを同期対象にする", () => {
   assert.equal(isReviewablePath("docs/specs/F001-demo/design.md"), true);
   assert.equal(isReviewablePath("docs/specs/F001-demo/tasks.md"), true);
   assert.equal(isReviewablePath("README.md"), false);
+});
+test("starter constitution templateはMergeしてもレビュー証跡同期対象にしない", () => {
+  assert.equal(isReviewableContent("# Project Constitution\n> **singleton / template**"), false);
+  assert.equal(isReviewableContent("# Project Constitution\n## Principles\n- P-001 実際の原則"), true);
 });
