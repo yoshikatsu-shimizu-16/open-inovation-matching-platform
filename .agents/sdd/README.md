@@ -13,13 +13,19 @@
 ## Pipeline
 
 ```text
-project requirements (全体要件・FR/NFR台帳) → [human review]
+project requirements (全体要件・FR/NFR台帳) → review PR → human merge
    ↓
-constitution (共通原則) → [human review]
+constitution (共通原則) → review PR → human merge
    ↓
 user flow選択 → [optional HTML mockでイメージ合わせ] → vertical slice選択 [human confirms scope/business decisions]
    ↓
-requirements(EARS: selected slice only) →[review]→ design →[review]→ tasks →[review]→ analyze(整合性ゲート)
+requirements(EARS: selected slice only) → review PR → human merge
+   ↓
+design → review PR → human merge
+   ↓
+tasks → review PR → human merge
+   ↓
+analyze(整合性ゲート)
    ↓
 implement
 ```
@@ -27,6 +33,37 @@ implement
 HTMLモックは必要な場合だけ作る。利用者の流れや情報提示を具体的に話し合うための仮説であり、正解、承認済み要件、技術設計、受入条件の代わりにはならない。モックから出た意見は人間が業務判断・仮説・未決事項に分け、AIが推測で決定しない。独立Skill `.agents/skills/mockup/SKILL.md` を利用できる。
 
 機能別SPECは初期版全体を一括で詳細化せず、人間が選んだ一つの縦切りに限定する。複数FR/NFRが関係する場合は対応関係を保ちつつ、そのループで実装・受入できる範囲だけを扱う。大きすぎる場合は独立して受け入れ可能な縦切りへ分割する。
+
+## Human Review と証跡
+
+SDD成果物の正式な人間承認は、対象成果物をレビューするPull Requestを人間がMergeする操作とする。Markdown内のReview情報は承認操作そのものではなく、GitHub上のMerge事実をローカルでも検証できる形へ同期した証跡である。
+
+レビュー前の成果物は次のmetadataを持つ。
+
+```markdown
+## Review
+
+- Status: pending
+- Evidence: —
+- Reviewed at: —
+- Reviewed by: —
+```
+
+Merge後は `.github/workflows/sdd-review-evidence.yml` が変更されたSDD成果物を検出し、次のように更新する。
+
+```markdown
+## Review
+
+- Status: reviewed
+- Evidence: PR #123
+- Reviewed at: 2026-09-26T10:49:33.000Z
+- Reviewed by: @reviewer
+```
+
+- Agentは自身の判断で `Status: reviewed` に変更しない。
+- レビュー済み成果物を実質変更する場合は、変更PR内で `Status: pending` に戻し、既存Evidenceを `—` にして再レビューを要求する。
+- HarnessはReview metadataと工程順序をローカルファイルだけで検証する。通常のHarness実行時にGitHub APIへ依存しない。
+- 既存forkの移行互換性として旧 `- [x] レビュー済み` は読み取り可能だが、新規・更新成果物ではmetadataを使用する。
 
 ## SDDとV字モデルの対応関係
 
@@ -112,7 +149,7 @@ SDDの実行方法は `.agents/`、全体要件・constitution・機能別成果
 
 ## 参考文献
 
-- AWS Kiro Docs: https://kiro.dev/docs/specs/ , https://kiro.dev/docs/steering/
+- AWS Kiro Docs: https://kiro.dev/docs/specs/ , https://kiro.dev/docs/specs/best-practices/
 - GitHub Spec Kit: https://github.com/github/spec-kit
 - Anthropic Claude Code Best Practices: https://code.claude.com/docs/en/best-practices
 - EARS: https://en.wikipedia.org/wiki/Easy_Approach_to_Requirements_Syntax
