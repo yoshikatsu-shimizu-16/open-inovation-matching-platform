@@ -1,5 +1,5 @@
 ---
-workflow_version: 4
+workflow_version: 5
 handoff_state: human-review
 max_scope: one-task
 ---
@@ -46,19 +46,19 @@ AI開発基盤の内部実装は `.agents/` に閉じ込め、通常のアプリ
 ```text
 Intent
   ↓
-project requirements (FR/NFR) → human review
+project requirements (FR/NFR) → review PR → human merge
   ↓
-constitution → human review
+constitution → review PR → human merge
   ↓
 user flow selection → optional HTML mock for shared understanding → choose one vertical slice
   ↓ human confirms scope and business decisions
 requirements.md (selected slice only)
-  ↓ human review
- design.md
-  ↓ human review
- tasks.md
-  ↓ human review
- sdd-analyze
+  ↓ review PR → human merge
+design.md
+  ↓ review PR → human merge
+tasks.md
+  ↓ review PR → human merge
+sdd-analyze
   ↓
 Implementation
 ```
@@ -70,9 +70,40 @@ Implementation
 - requirements の人間レビュー後に `.agents/skills/sdd-plan` で design を作る。
 - design の人間レビュー後に `.agents/skills/sdd-tasks` で実装タスクへ分解する。
 - tasks の人間レビュー後に `.agents/skills/sdd-analyze` で整合性を確認する。
-- ReviewチェックをAIが勝手に完了扱いにしない。
+- SDDの正式な人間承認は、対象成果物を含むレビュー用Pull Requestを人間がMergeする操作とする。
+- Agentは `Status: pending` を自身の判断で `reviewed` へ変更しない。Merge後の `.github/workflows/sdd-review-evidence.yml` がGitHubのMerge事実をReview metadataへ同期する。
 - SDDの生成物は `docs/specs/<feature>/` に置く。
 - ユーザー可視の振る舞いを持たない複雑なリファクタ・依存更新・infra変更は `docs/exec-plans/` を使う。
+
+## Human review evidence
+
+SDD成果物の `## Review` は、手作業のチェックボックスではなく次のmetadataで管理する。
+
+```markdown
+## Review
+
+- Status: pending
+- Evidence: —
+- Reviewed at: —
+- Reviewed by: —
+```
+
+人間がレビュー用PRをMergeした後、GitHub Actionsが対象成果物を次の形へ同期する。
+
+```markdown
+## Review
+
+- Status: reviewed
+- Evidence: PR #123
+- Reviewed at: 2026-09-26T10:49:33.000Z
+- Reviewed by: @reviewer
+```
+
+- **GitHubのMerge記録が承認のsource of truth** であり、Markdown metadataはその事実をローカルで検証可能にする同期情報である。
+- Review metadataは `docs/project-requirements.md`、`docs/constitution.md`、`docs/specs/<feature>/{requirements,design,tasks}.md` に適用する。
+- レビュー済み成果物を実質変更する場合は、変更PR内で `Status: pending` に戻し、Evidence / Reviewed at / Reviewed byを `—` に戻して再レビューを要求する。
+- `.agents/scripts/harness/checks/spec-check.sh` はReview metadataと工程順序を検証する。同期Actionが失敗してmetadataがpendingのままなら、後続工程へ進まずAction失敗を修正する。
+- 既存forkの移行互換性のため旧 `- [x] レビュー済み` はHarnessで読み取り可能だが、新規・更新成果物ではReview metadataを使用する。
 
 ## Select implementation area
 
@@ -105,7 +136,8 @@ Pull Request は人間が変更目的とレビュー対象を一覧で判断す�
 - コロン以降の変更概要は日本語で記述し、PR一覧だけで何を変更するPRか判断できる具体的な内容にする。製品名、API名、Feature ID、技術用語などは必要に応じて英語表記のままでよい。
 - `update files`、`fix issue`、`changes` のように変更対象や目的が分からない曖昧なタイトルを使用しない。
 - 1つのPRには1つの明確な目的を持たせ、タイトルはその目的を表す。レビュー中にスコープや目的が変わった場合はタイトルも更新する。
-- この規則は Application Development Mode と Kit Maintenance Mode の両方に適用する。
+- SDD成果物のレビュー用PRでは、MergeがHuman Reviewの承認操作になる。未承認の成果物を別PRで暗黙に後続工程へ進めない。
+- この規則は Application Development Mode と Kit Maintenance Mode の両方へ適用する。
 
 例:
 
@@ -134,6 +166,7 @@ Pull Request は人間が変更目的とレビュー対象を一覧で判断す�
 - 未検証事項
 - 判断・トレードオフ
 - specとの差分が残っていないか
+- SDD Review metadata / PR evidence の状態
 - 次に必要な作業
 
 自動実行の成功状態は必ずしもプロジェクト全体の `Done` ではない。
