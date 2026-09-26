@@ -1,0 +1,130 @@
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { pathToFileURL } from "node:url";
+
+const API_VERSION = "2022-11-28";
+
+/**
+ * GitHub Mergeをレビュー証跡として同期する対象ファイルか判定する。
+ *
+ * @param {string} filePath リポジトリ相対パス。
+ * @returns {boolean} Review metadataを持つSDD成果物ならtrue。
+ */
+export function isReviewablePath(filePath) {
+  return (
+    filePath === "docs/project-requirements.md" ||
+    filePath === "docs/constitution.md" ||
+    /^docs\/specs\/[^/]+\/(?:requirements|design|tasks)\.md$/.test(filePath)
+  );
+}
+
+/**
+ * ## Review セクションをMerge済みPRの証跡へ更新する。
+ * すでにreviewedの文書は既存証跡を保持する。再レビューが必要な変更では、
+ * PR作成時にStatusをpendingへ戻してから人間レビューへ渡す。
+ *
+ * @param {string} content Markdown本文。
+ * @param {{prNumber: string, reviewedAt: string, reviewedBy: string}} evidence レビュー証跡。
+ * @returns {{content: string, changed: boolean}} 更新後本文と変更有無。
+ */
+export function syncReviewMetadata(content, evidence) {
+  const heading = /^## Review\s*$/m.exec(content);
+  if (!heading) {
+    throw new Error("missing ## Review section");
+  }
+
+  const sectionStart = heading.index + heading[0].length;
+  const tail = content.slice(sectionStart);
+  const nextHeading = /\n##\s/.exec(tail);
+  const sectionEnd = nextHeading ? sectionStart + nextHeading.index : content.length;
+  const currentSection = content.slice(sectionStart, sectionEnd);
+  const currentStatus = /^\s*-\s*Status:\s*(\S+)\s*$/mi.exec(currentSection)?.[1]?.toLowerCase();
+
+  if (currentStatus === "reviewed") {
+    return { content, changed: false };
+  }
+
+  const reviewedAt = new Date(evidence.reviewedAt);
+  if (Number.isNaN(reviewedAt.getTime())) {
+    throw new Error(`invalid reviewedAt: ${evidence.reviewedAt}`);
+  }
+
+  const reviewBlock = [
+    "",
+    "",
+    "- Status: reviewed",
+    `- Evidence: PR #${evidence.prNumber}`,
+    `- Reviewed at: ${reviewedAt.toISOString()}`,
+    `- Reviewed by: @${evidence.reviewedBy}`,
+    "",
+  ].join("\n");
+
+  return {
+    content: `${content.slice(0, sectionStart)}${reviewBlock}${content.slice(sectionEnd)}`,
+    changed: true,
+  };
+}
+
+/**
+ * 対象PRで変更されたファイル一覧をGitHub APIから取得する。
+ *
+ * @param {{repository: string, prNumber: string, token: string}} input API入力。
+ * @returns {Promise<string[]>} 変更ファイルのリポジトリ相対パス。
+ */
+async function fetchChangedFiles(input) {
+  const files = [];
+  for (let page = 1; ; page += 1) {
+    const response = await fetch(
+      `https://api.github.com/repos/${input.repository}/pulls/${input.prNumber}/files?per_page=100&page=${page}`,
+      {
+        headers: {
+          Accept: "application/vnd.github+json",
+          Authorization: `Bearer ${input.token}`,
+          "X-GitHub-Api-Version": API_VERSION,
+        },
+      },
+    );
+    if (!response.ok) {
+      throw new Error(`GitHub API failed: ${response.status} ${await response.text()}`);
+    }
+    const pageFiles = await response.json();
+    files.push(...pageFiles.map((file) => file.filename));
+    if (pageFiles.length < 100) break;
+  }
+  return files;
+}
+
+/** Merge済みPRのReview metadataをワークツリーへ反映する。 */
+async function main() {
+  const token = process.env.GITHUB_TOKEN;
+  const repository = process.env.GITHUB_REPOSITORY;
+  const prNumber = process.env.PR_NUMBER;
+  const reviewedAt = process.env.REVIEWED_AT;
+  const reviewedBy = process.env.REVIEWED_BY;
+
+  if (!token || !repository || !prNumber || !reviewedAt || !reviewedBy) {
+    throw new Error("GITHUB_TOKEN, GITHUB_REPOSITORY, PR_NUMBER, REVIEWED_AT, REVIEWED_BY are required");
+  }
+
+  const changedFiles = await fetchChangedFiles({ repository, prNumber, token });
+  const reviewableFiles = changedFiles.filter(isReviewablePath);
+
+  for (const filePath of reviewableFiles) {
+    if (!existsSync(filePath)) continue;
+    const original = readFileSync(filePath, "utf8");
+    const result = syncReviewMetadata(original, { prNumber, reviewedAt, reviewedBy });
+    if (!result.changed) continue;
+    writeFileSync(filePath, result.content);
+    console.log(`[sdd-review] reviewed: ${filePath}`);
+  }
+
+  if (!reviewableFiles.length) {
+    console.log("[sdd-review] no SDD review artifacts changed");
+  }
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((error) => {
+    console.error(`[sdd-review] ${error.stack ?? error.message}`);
+    process.exit(1);
+  });
+}
