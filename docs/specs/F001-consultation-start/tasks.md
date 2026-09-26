@@ -46,7 +46,8 @@ T008 ではproduction deploy、production migration、secret変更、production 
 
 ## Review
 
-- Status: pending
-- Evidence: —
-- Reviewed at: —
-- Reviewed by: —
+
+- Status: reviewed
+- Evidence: PR #13
+- Reviewed at: 2026-09-26T13:48:48.000Z
+- Reviewed by: @yoshikatsu-shimizu-16
