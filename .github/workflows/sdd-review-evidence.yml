@@ -36,6 +36,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
           REVIEWED_AT: ${{ github.event.pull_request.merged_at }}
           REVIEWED_BY: ${{ github.event.pull_request.merged_by.login }}
         run: node .agents/scripts/sdd/sync-review-metadata.mjs
