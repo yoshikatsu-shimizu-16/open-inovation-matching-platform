@@ -5,6 +5,7 @@ import { spawnSync } from "node:child_process";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
+  assertMergedRevisionMatchesCurrent,
   isReviewableContent,
   isReviewablePath,
   syncReviewMetadata,
@@ -52,7 +53,10 @@ ${review(requirementReviewed)}
     }
     if (legacy) {
       mkdirSync(join(root, "docs/specs/hono-backend-boilerplate"));
-      writeFileSync(join(root, "docs/specs/hono-backend-boilerplate/requirements.md"), "- [x] レビュー済み\nREQ-001");
+      writeFileSync(
+        join(root, "docs/specs/hono-backend-boilerplate/requirements.md"),
+        "# Legacy\nREQ-001\n## Review\n- [x] レビュー済み\n",
+      );
     }
     const result = spawnSync("bash", [checker], { cwd: root, encoding: "utf8" });
     return { status: result.status, output: result.stdout + result.stderr };
@@ -101,6 +105,23 @@ test("designはrequirementsのreviewed metadataがないと作成済み扱いに
     rmSync(root, { recursive: true, force: true });
   }
 });
+test("Review外のmetadata例示はレビュー済み判定に使わない", () => {
+  const root = mkdtempSync(join(tmpdir(), "sdd-review-section-"));
+  try {
+    mkdirSync(join(root, "docs/specs/dialogue"), { recursive: true });
+    writeFileSync(join(root, "docs/project-requirements.md"), project([fr(), nfr()], true));
+    writeFileSync(join(root, "docs/constitution.md"), constitution(true));
+    writeFileSync(
+      join(root, "docs/specs/dialogue/requirements.md"),
+      `# Dialogue\n## Parent requirements\nFR-001\nREQ-001\n## Example\n${review(true)}\n## Review\n${review(false)}\n`,
+    );
+    writeFileSync(join(root, "docs/specs/dialogue/design.md"), `# Design\n## Review\n${review(false)}\n`);
+    const result = spawnSync("bash", [checker], { cwd: root, encoding: "utf8" });
+    assert.match(result.stdout + result.stderr, /design.md exists before requirements.md is reviewed/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
 
 test("review metadata syncはpendingをMerge証跡へ変換する", () => {
   const source = `# Requirements\n\n## Review\n\n${review(false)}\n`;
@@ -123,6 +144,20 @@ test("review metadata syncは既存のreviewed証跡を上書きしない", () =
   });
   assert.equal(result.changed, false);
   assert.equal(result.content, source);
+});
+test("Merge後に同じ成果物が変わっていれば古いレビュー証跡を拒否する", () => {
+  assert.doesNotThrow(() =>
+    assertMergedRevisionMatchesCurrent("same revision", "same revision", "docs/specs/F001-demo/requirements.md"),
+  );
+  assert.throws(
+    () =>
+      assertMergedRevisionMatchesCurrent(
+        "newer content",
+        "reviewed content",
+        "docs/specs/F001-demo/requirements.md",
+      ),
+    /changed after the reviewed PR was merged/,
+  );
 });
 test("review対象パスだけを同期対象にする", () => {
   assert.equal(isReviewablePath("docs/project-requirements.md"), true);
