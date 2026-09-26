@@ -117,4 +117,7 @@ EARSの英語キーワードは文章本文ではなく構文ラベルとして�
 
 ## Review
 
-- [ ] レビュー済み(この状態になってから `plan` スキルへ進む)
+- Status: reviewed
+- Evidence: PR #7
+- Reviewed at: 2026-09-26T10:49:33.000Z
+- Reviewed by: @swdevsmz
