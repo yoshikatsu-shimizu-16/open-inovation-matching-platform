@@ -1,6 +1,8 @@
 # Requirements: 相談開始
 
 > 出力元: `sdd-specify` スキル(`.agents/skills/sdd-specify/SKILL.md`)
+> Feature ID: `F001`
+> Feature slug: `consultation-start`
 > 出力先: `docs/specs/F001-consultation-start/requirements.md`
 
 ## Parent requirements
