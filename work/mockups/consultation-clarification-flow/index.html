@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>相談・課題明確化フロー モックアップ</title>
+  <link rel="stylesheet" href="./consultation-clarification-mockup.css" />
+</head>
+<body>
+  <div class="prototype-banner">
+    <strong>レビュー用モック</strong>
+    <span>実データ保存・外部AI呼び出し・候補評価は行いません。画面と業務フローを確認するための仮説です。</span>
+  </div>
+
+  <header class="app-header">
+    <div>
+      <p class="product-name">共創マッチングプラットフォーム</p>
+      <h1>相談と課題の明確化</h1>
+    </div>
+    <button id="restartButton" class="button button-secondary" type="button">最初から確認する</button>
+  </header>
+
+  <main class="app-shell">
+    <aside class="flow-panel" aria-label="相談の進行状況">
+      <div class="flow-panel__heading">
+        <span>今回の確認フロー</span>
+        <strong id="flowStatus">開始前</strong>
+      </div>
+      <ol class="flow-steps">
+        <li class="flow-step is-active" data-step="start">
+          <span class="flow-step__number">1</span>
+          <div><strong>相談開始</strong><small>困りごとを自分の言葉で入力</small></div>
+        </li>
+        <li class="flow-step" data-step="interview">
+          <span class="flow-step__number">2</span>
+          <div><strong>不足情報の確認</strong><small>5カテゴリ・13項目を確認</small></div>
+        </li>
+        <li class="flow-step" data-step="hypothesis">
+          <span class="flow-step__number">3</span>
+          <div><strong>共創仮説の確認</strong><small>事実と仮説を分けて確認</small></div>
+        </li>
+        <li class="flow-step" data-step="profile">
+          <span class="flow-step__number">4</span>
+          <div><strong>課題プロフィール</strong><small>下書きを修正して明示的に確定</small></div>
+        </li>
+        <li class="flow-step" data-step="confirmed">
+          <span class="flow-step__number">5</span>
+          <div><strong>確定</strong><small>次の候補評価フローへ接続</small></div>
+        </li>
+      </ol>
+      <div class="principle-note">
+        <strong>このモックで守る境界</strong>
+        <p>AIが勝手に事実や確定状態を作らず、相談者の確認を状態遷移の境界にします。</p>
+      </div>
+    </aside>
+
+    <section class="screen-area">
+      <section class="screen is-visible" data-screen="start" aria-labelledby="start-title">
+        <div class="screen-heading">
+          <div>
+            <p class="screen-kicker">相談開始</p>
+            <h2 id="start-title">まず、いま困っていることを教えてください</h2>
+            <p>うまく整理できていなくても構いません。分からないことは、あとで「未確認」のまま残せます。</p>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <label class="field-label" for="initialConsultation">相談内容</label>
+          <textarea id="initialConsultation" rows="7" placeholder="例：地域企業と新しいサービスを作りたいが、自社に足りない技術や、どんな相手と組むべきか整理できていない。"></textarea>
+          <div class="field-help">
+            <span>秘密情報や未公開知財の詳細ではなく、まずは抽象化した内容を入力する想定です。</span>
+            <button id="insertSampleButton" class="text-button" type="button">サンプル相談を入れる</button>
+          </div>
+          <div class="action-row action-row--end">
+            <button id="startConsultationButton" class="button button-primary" type="button">相談を始める</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="interview" aria-labelledby="interview-title">
+        <div class="screen-heading screen-heading--with-meta">
+          <div>
+            <p class="screen-kicker">不足情報の確認</p>
+            <h2 id="interview-title">確認できていない点を順番に整理します</h2>
+            <p>回答できない項目は「未確認」のまま進められます。正式な13項目名ではなく、今回の画面検討用に仮分解しています。</p>
+          </div>
+          <div class="progress-summary">
+            <strong id="progressCount">0 / 13</strong>
+            <span>確認済み・未確認を含む</span>
+          </div>
+        </div>
+
+        <div class="interview-layout">
+          <div class="conversation-card">
+            <div class="ai-message">
+              <span class="message-author">整理アシスタント</span>
+              <p id="currentQuestion">質問を準備しています。</p>
+              <small id="questionReason">確認理由</small>
+            </div>
+
+            <label class="field-label" for="interviewAnswer">あなたの回答</label>
+            <textarea id="interviewAnswer" rows="5" placeholder="分かる範囲で入力してください"></textarea>
+            <div class="action-row action-row--spread">
+              <button id="skipQuestionButton" class="button button-secondary" type="button">分からないので未確認にする</button>
+              <div class="inline-actions">
+                <button id="fillAnswerButton" class="text-button" type="button">サンプル回答</button>
+                <button id="submitAnswerButton" class="button button-primary" type="button">回答して次へ</button>
+              </div>
+            </div>
+          </div>
+
+          <aside class="status-card" aria-label="確認状況">
+            <div class="status-card__header">
+              <div>
+                <span>5カテゴリ</span>
+                <strong id="currentCategory">目的・背景・困りごと</strong>
+              </div>
+              <span class="version-label">対話ルール v0.1（仮）</span>
+            </div>
+            <div id="categoryProgress" class="category-progress"></div>
+            <div class="legend">
+              <span><i class="legend-dot legend-dot--confirmed"></i>確認済み</span>
+              <span><i class="legend-dot legend-dot--unknown"></i>未確認</span>
+              <span><i class="legend-dot"></i>未回答</span>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="hypothesis" aria-labelledby="hypothesis-title">
+        <div class="screen-heading">
+          <div>
+            <p class="screen-kicker">共創仮説の確認</p>
+            <h2 id="hypothesis-title">AIの整理結果を、そのまま確定せずに確認します</h2>
+            <p>相談者が入力した事実と、そこから導いた検討仮説を分けて表示する想定です。</p>
+          </div>
+        </div>
+
+        <div class="two-column-grid">
+          <article class="content-card">
+            <div class="card-heading">
+              <h3>確認できた事実</h3>
+              <span class="status-badge status-badge--fact">相談者入力</span>
+            </div>
+            <ul id="factList" class="summary-list"></ul>
+          </article>
+
+          <article class="content-card content-card--accent">
+            <div class="card-heading">
+              <h3>共創の可能性（仮説）</h3>
+              <span class="status-badge status-badge--hypothesis">要確認</span>
+            </div>
+            <label class="field-label" for="hypothesisText">仮説の内容</label>
+            <textarea id="hypothesisText" rows="8">外部の技術パートナーと小規模な検証を行い、自組織だけでは不足する実装能力を補完できる可能性がある。相手に期待する役割と、提供できる資源・制約を明確にしてから候補を検討する。</textarea>
+            <div class="unconfirmed-box">
+              <strong>未確認事項</strong>
+              <p id="unknownSummary">未確認にした項目がここに表示されます。</p>
+            </div>
+          </article>
+        </div>
+
+        <div class="action-row action-row--spread">
+          <button class="button button-secondary" type="button" data-back-to="interview">聞き取りに戻る</button>
+          <button id="acceptHypothesisButton" class="button button-primary" type="button">修正内容を反映して課題プロフィールへ</button>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="profile" aria-labelledby="profile-title">
+        <div class="screen-heading screen-heading--with-meta">
+          <div>
+            <p class="screen-kicker">課題プロフィール</p>
+            <h2 id="profile-title">候補評価に渡す内容を、項目ごとに確認します</h2>
+            <p>この状態はまだ下書きです。明示的に確定するまで、候補評価には進めません。</p>
+          </div>
+          <span class="draft-label">下書き</span>
+        </div>
+
+        <div class="profile-grid">
+          <label class="profile-field">
+            <span>目的・背景</span>
+            <textarea rows="4" data-profile-field="purpose">地域企業との新しいサービス検討に向けて、自組織だけでは整理できていない協業テーマと必要能力を明確にしたい。</textarea>
+          </label>
+          <label class="profile-field">
+            <span>保有資源</span>
+            <textarea rows="4" data-profile-field="resources">現場課題に関する知見、検証に協力できる担当者、既存顧客との接点。</textarea>
+          </label>
+          <label class="profile-field">
+            <span>課題・不足能力</span>
+            <textarea rows="4" data-profile-field="gap">新サービスを具体化するための技術検証・実装能力が不足している。</textarea>
+          </label>
+          <label class="profile-field">
+            <span>相手への期待</span>
+            <textarea rows="4" data-profile-field="partner">技術面の仮説検証を一緒に行い、実現可能性と役割分担を整理できる相手。</textarea>
+          </label>
+          <label class="profile-field">
+            <span>連携形態</span>
+            <textarea rows="4" data-profile-field="collaboration">まずは小規模な検証から開始する想定。正式な契約形態は未確定。</textarea>
+          </label>
+          <label class="profile-field">
+            <span>条件・制約</span>
+            <textarea rows="4" data-profile-field="constraints">未公開情報の取り扱いに配慮し、初期段階では抽象化した情報だけで候補を検討する。</textarea>
+          </label>
+          <label class="profile-field profile-field--wide">
+            <span>未確認事項</span>
+            <textarea id="profileUnknowns" rows="4" data-profile-field="unknowns">正式な予算、実施時期、契約条件などは未確認。</textarea>
+          </label>
+        </div>
+
+        <div class="decision-boundary">
+          <div>
+            <strong>ここが人の確認境界です</strong>
+            <p>内容を確定すると、この版だけが次の候補評価の入力になります。</p>
+          </div>
+          <button id="openConfirmButton" class="button button-primary" type="button">この課題プロフィールを確定する</button>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="confirmed" aria-labelledby="confirmed-title">
+        <div class="completion-card">
+          <div class="completion-icon" aria-hidden="true">✓</div>
+          <p class="screen-kicker">課題プロフィール確定</p>
+          <h2 id="confirmed-title">確定版 v1 を作成しました</h2>
+          <p>このモックでは保存しませんが、実装時はこの確定版だけを候補評価に渡す想定です。</p>
+          <div class="completion-summary">
+            <span>次の工程</span>
+            <strong>段階2：候補評価と評価根拠の確認</strong>
+            <small>今回のモック対象外。別の縦切りとして仕様化・モック化します。</small>
+          </div>
+          <button id="candidateFlowButton" class="button button-primary" type="button">候補評価フローの入口を確認する</button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div id="confirmModal" class="modal" hidden>
+    <div class="modal__backdrop" data-close-modal></div>
+    <section class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+      <p class="screen-kicker">最終確認</p>
+      <h2 id="confirm-title">この内容を候補評価の入力として確定しますか？</h2>
+      <p>確定前の下書きと区別し、確定した版だけを次工程で利用する想定です。</p>
+      <div class="action-row action-row--end">
+        <button class="button button-secondary" type="button" data-close-modal>戻って修正する</button>
+        <button id="confirmProfileButton" class="button button-primary" type="button">確定する</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="./consultation-clarification-mockup.js"></script>
+</body>
+</html>
