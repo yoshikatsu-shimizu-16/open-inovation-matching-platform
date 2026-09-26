@@ -31,6 +31,11 @@ jobs:
         with:
           node-version: 24
 
+      - name: Verify SDD review state before sync
+        run: |
+          node --test .agents/scripts/harness/tests/spec-check.test.mjs .agents/scripts/harness/tests/sdd-review-workflow.test.mjs
+          bash .agents/scripts/harness/checks/spec-check.sh --stage
+
       - name: Sync SDD review metadata
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -41,10 +46,8 @@ jobs:
           REVIEWED_BY: ${{ github.event.pull_request.merged_by.login }}
         run: node .agents/scripts/sdd/sync-review-metadata.mjs
 
-      - name: Verify SDD review state
-        run: |
-          node --test .agents/scripts/harness/tests/spec-check.test.mjs
-          bash .agents/scripts/harness/checks/spec-check.sh --stage
+      - name: Verify SDD review state after sync
+        run: bash .agents/scripts/harness/checks/spec-check.sh --stage
 
       - name: Commit review evidence
         env:
