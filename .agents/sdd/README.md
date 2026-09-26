@@ -17,10 +17,16 @@ project requirements (全体要件・FR/NFR台帳) → [human review]
    ↓
 constitution (共通原則) → [human review]
    ↓
-requirements(EARS) →[review]→ design →[review]→ tasks →[review]→ analyze(整合性ゲート)
+user flow選択 → [optional HTML mockでイメージ合わせ] → vertical slice選択 [human confirms scope/business decisions]
+   ↓
+requirements(EARS: selected slice only) →[review]→ design →[review]→ tasks →[review]→ analyze(整合性ゲート)
    ↓
 implement
 ```
+
+HTMLモックは必要な場合だけ作る。利用者の流れや情報提示を具体的に話し合うための仮説であり、正解、承認済み要件、技術設計、受入条件の代わりにはならない。モックから出た意見は人間が業務判断・仮説・未決事項に分け、AIが推測で決定しない。独立Skill `.agents/skills/mockup/SKILL.md` を利用できる。
+
+機能別SPECは初期版全体を一括で詳細化せず、人間が選んだ一つの縦切りに限定する。複数FR/NFRが関係する場合は対応関係を保ちつつ、そのループで実装・受入できる範囲だけを扱う。大きすぎる場合は独立して受け入れ可能な縦切りへ分割する。
 
 ## SDDとV字モデルの対応関係
 
@@ -30,7 +36,8 @@ implement
 |---|---|---|
 | 全体要件定義 | `docs/project-requirements.md` | プロジェクトに1つ、変更時は改訂 |
 | 共通原則 | `docs/constitution.md` | プロジェクトに1つ、変更時は影響確認と再レビュー |
-| 詳細設計〜実装計画 | `docs/specs/<feature>/{requirements,design,tasks}.md` | 機能(feature)ごとに繰り返す |
+| 利用者フローのイメージ合わせ | 任意の簡易HTMLモック | 次の縦切りを選ぶ時に必要なら実施。要件や設計の正解とはみなさない |
+| 詳細設計〜実装計画 | `docs/specs/<feature>/{requirements,design,tasks}.md` | 人間が選んだ縦切りごとに繰り返す |
 | 実装 | 通常の実装作業(1タスク単位は`.agents/harness-engineering/task-contract-template.md`を併用) | tasks.mdの各項目ごと |
 | 単体テスト | `.agents/harness-engineering/quality-gates.md` Gate 1-2。requirements.mdのacceptance criteria(EARS)をテストへ変換する | tasksの実装ごと |
 | 結合・総合テスト | `.agents/harness-engineering/quality-gates.md` Gate 3-7、`.agents/harness-engineering/verification-matrix.md` | 機能ごと |
@@ -75,6 +82,7 @@ SDDの実行方法は `.agents/`、全体要件・constitution・機能別成果
 | Skill | 出力 | 実体 |
 |---|---|---|
 | `sdd-project-requirements` | `docs/project-requirements.md` | `.agents/skills/sdd-project-requirements/SKILL.md` |
+| `mockup` | 一時的な簡易HTMLモックと説明 | `.agents/skills/mockup/SKILL.md` |
 | `sdd-constitution` | `docs/constitution.md` | `.agents/skills/sdd-constitution/SKILL.md` |
 | `sdd-specify` | `docs/specs/<feature>/requirements.md` | `.agents/skills/sdd-specify/SKILL.md` |
 | `sdd-plan` | `docs/specs/<feature>/design.md` | `.agents/skills/sdd-plan/SKILL.md` |

@@ -50,7 +50,9 @@ project requirements (FR/NFR) → human review
   ↓
 constitution → human review
   ↓
-requirements.md
+user flow selection → optional HTML mock for shared understanding → choose one vertical slice
+  ↓ human confirms scope and business decisions
+requirements.md (selected slice only)
   ↓ human review
  design.md
   ↓ human review
@@ -63,7 +65,8 @@ Implementation
 
 - `.agents/skills/sdd-project-requirements` で全体要件とFR/NFR台帳を作り、人間レビューを受ける。
 - `.agents/skills/sdd-constitution` で共通原則を作り、人間レビューを受ける。
-- `.agents/skills/sdd-specify` で対応するFR/NFRに紐づく機能別requirementsを作る。
+- 全体要件から次に検討する利用者フローを一つ選ぶ。必要なら `.agents/skills/mockup` で簡易HTMLモックを作り、画面と流れのイメージ合わせに使う。モックは仮説を話し合うための成果物であり、正解・承認済み要件・実装仕様の代わりではない。
+- 人間が業務判断と今回の範囲を確認した後、`.agents/skills/sdd-specify` で選択した縦切りに必要なFR/NFRだけを機能別requirementsへ具体化する。システム全体や複数段階を一度に詳細仕様化しない。
 - requirements の人間レビュー後に `.agents/skills/sdd-plan` で design を作る。
 - design の人間レビュー後に `.agents/skills/sdd-tasks` で実装タスクへ分解する。
 - tasks の人間レビュー後に `.agents/skills/sdd-analyze` で整合性を確認する。
@@ -84,6 +87,7 @@ Implementation
 ## Work
 
 - 一度に1つの明確なtaskへ集中する。
+- 1つのSPECは、利用者が価値を確認でき受入条件を定義できる一つの縦切りを対象とする。大きい場合は独立して受け入れられる機能ループへ分け、依存関係を記録する。
 - `tasks.md` がある場合は未完了taskを1つ選ぶ。
 - 変更はspec/designと一致する最小のcoherent changeにする。
 - unrelated refactorを混ぜない。
