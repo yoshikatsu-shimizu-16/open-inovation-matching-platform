@@ -31,6 +31,30 @@ features/
 
 ファイル名には原則として `d1-`、`drizzle-`、`postgres-` などの製品名・ライブラリ名を付けない。これらは実装技術であり、feature の業務責務ではないためである。
 
+TypeScript では Java の `XxxRepositoryImpl` を機械的に作らず、必要であれば同じ `repository.ts` で contract と factory を公開する。
+
+```ts
+export interface ConsultationRepository {
+  create(consultation: Consultation): Promise<void>;
+}
+
+export function createConsultationRepository(
+  db: Database,
+): ConsultationRepository {
+  return {
+    async create(consultation) {
+      await db.insert(consultations).values({
+        id: consultation.id,
+        initialContent: consultation.initialContent,
+        status: consultation.status,
+      });
+    },
+  };
+}
+```
+
+interface と実装を別ファイルへ分けること自体を禁止しないが、分割のためだけに `Impl` や ORM / DB 製品名を持つ実装ファイルを追加しない。変更理由や責務が実際に分かれる場合にのみ分割する。
+
 ### 2. DB アクセスには Drizzle ORM を利用する
 
 D1 への SQL 発行と型マッピングには Drizzle ORM を利用する。
@@ -52,21 +76,22 @@ backend/src/shared/database/
 - `schema/` は Drizzle のテーブル schema を保持する。
 - feature の command / domain は `D1Database` を直接知らない。
 
-依存関係は次の形とする。
+初期化と利用の関係は次の形とする。
 
 ```text
-Hono route
-    ↓
-Command / Domain
-    ↓
-feature repository.ts
-    ↓
-Drizzle
-    ↓
-shared/database/db.ts
-    ↓
 Cloudflare D1 binding
+        ↓
+shared/database/db.ts
+  drizzle(env.DB)
+        ↓
+Drizzle DB object
+        ↓
+feature repository.ts
+        ↓
+Command / Domain から利用
 ```
+
+HTTP 入口側では Hono route が `c.env.DB` を共通 DB factory へ渡して DB object と repository を組み立てる。DB 接続技術を command / domain へ流出させない。
 
 ### 4. ORM と Repository の責務を分ける
 
@@ -95,7 +120,7 @@ Cloudflare D1 binding
 ## Consequences
 
 - feature のディレクトリ構造が DB 製品や ORM 名に引きずられない。
-- D1 固有処理は shared database 層へ限定できる。
+- D1 binding と Drizzle 初期化を shared database 層へ限定できる。
 - PostgreSQL 等へ移行する場合も、command / domain の変更を避けやすい。
 - Drizzle schema と migration の整合性を保つ必要がある。
 - DB 固有機能を利用する場合は、その依存を repository または shared database 層に閉じ込め、設計判断として明示する。
