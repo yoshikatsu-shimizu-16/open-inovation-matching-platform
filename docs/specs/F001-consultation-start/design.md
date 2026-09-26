@@ -373,7 +373,8 @@ F001 では採用しない。この route を成立させるには consultation 
 
 ## Review
 
-- Status: pending
-- Evidence: —
-- Reviewed at: —
-- Reviewed by: —
+
+- Status: reviewed
+- Evidence: PR #12
+- Reviewed at: 2026-09-26T13:31:19.000Z
+- Reviewed by: @swdevsmz
