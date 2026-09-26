@@ -26,6 +26,7 @@ ${review(reviewed)}
 const constitution = (reviewed = true) => `# Project Constitution
 ## Principles
 - P-001: 仕様をレビューしてから実装する。
+- 機能別仕様は \`docs/specs/<feature>/\` に置く。
 ## Review
 ${review(reviewed)}
 `;
@@ -68,6 +69,9 @@ test("新しいSPECはレビュー済みの全体要件とconstitutionを必要�
   assert.match(runFixture({ projectReviewed: false }).output, /must be human-reviewed/);
   assert.match(runFixture({ constitutionReviewed: false }).output, /constitution must be human-reviewed/);
   assert.equal(runFixture({}).status, 0);
+});
+test("対応SPECのMarkdown code spanを正規化して実在ディレクトリへ照合する", () => {
+  assert.equal(runFixture({ rows: [fr("`dialogue`"), nfr()] }).status, 0);
 });
 test("番号の欠番・重複と存在しない参照を拒否する", () => {
   assert.match(runFixture({ rows: [fr(), fr(), nfr()] }).output, /duplicate requirement ID/);
