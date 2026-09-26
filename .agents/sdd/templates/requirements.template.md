@@ -1,11 +1,13 @@
 # Requirements: <feature>
 
 > 出力元: `sdd-specify` スキル(`.agents/skills/sdd-specify/SKILL.md`)
-> 出力先: `docs/specs/<feature>/requirements.md`
+> Feature ID: `<feature-id>`
+> Feature slug: `<feature-slug>`
+> 出力先: `docs/specs/<feature-id>-<feature-slug>/requirements.md`
 
 ## Parent requirements
 
-`docs/project-requirements.md` の対応元IDを明記する（例: `FR-001`, `NFR-001`）。全体要件台帳の「対応SPEC」欄にもこの機能のディレクトリ名を記す。
+`docs/project-requirements.md` の対応元IDを明記する（例: `FR-001`, `NFR-001`）。全体要件台帳の「対応SPEC」欄にもFeature IDを含む完全なディレクトリ名を記す。
 
 ## Overview
 
