@@ -18,6 +18,16 @@ export function isReviewablePath(filePath) {
 }
 
 /**
+ * starterの未具体化テンプレートを人間承認済み成果物として同期しないための判定。
+ *
+ * @param {string} content Markdown本文。
+ * @returns {boolean} 実プロジェクトのレビュー対象として同期可能ならtrue。
+ */
+export function isReviewableContent(content) {
+  return !content.includes("**singleton / template**");
+}
+
+/**
  * ## Review セクションをMerge済みPRの証跡へ更新する。
  * すでにreviewedの文書は既存証跡を保持する。再レビューが必要な変更では、
  * PR作成時にStatusをpendingへ戻してから人間レビューへ渡す。
@@ -111,6 +121,10 @@ async function main() {
   for (const filePath of reviewableFiles) {
     if (!existsSync(filePath)) continue;
     const original = readFileSync(filePath, "utf8");
+    if (!isReviewableContent(original)) {
+      console.log(`[sdd-review] skip starter template: ${filePath}`);
+      continue;
+    }
     const result = syncReviewMetadata(original, { prNumber, reviewedAt, reviewedBy });
     if (!result.changed) continue;
     writeFileSync(filePath, result.content);
