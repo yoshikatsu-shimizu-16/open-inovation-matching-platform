@@ -111,7 +111,7 @@ fi
 
 # SDD skillは各Agentが実際に探索する場所
 # (.agents/skills/ for Codex etc., .claude/skills/ for Claude Code) に配置する。
-for skill in sdd-project-requirements sdd-constitution sdd-specify sdd-plan sdd-tasks sdd-analyze; do
+for skill in sdd-project-requirements sdd-constitution mockup sdd-specify sdd-plan sdd-tasks sdd-analyze; do
   agents_file=".agents/skills/${skill}/SKILL.md"
   claude_file=".claude/skills/${skill}/SKILL.md"
   for f in "$agents_file" "$claude_file"; do

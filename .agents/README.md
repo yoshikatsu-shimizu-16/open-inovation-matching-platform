@@ -8,7 +8,7 @@
 
 ```text
 .agents/
-├── skills/                 # Codex等が発見するcanonical skills
+├── skills/                 # Codex等が発見するcanonical skills（SDD・HTMLモック等）
 ├── sdd/                    # SDD method / templates
 ├── standards/              # 技術非依存の共通ルール
 ├── profiles/               # React / Hono / Cloudflare等の技術固有ルール
