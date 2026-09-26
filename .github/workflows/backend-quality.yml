@@ -46,4 +46,4 @@ jobs:
         working-directory: frontend
 
       - name: Harness verify
-        run: npm run harness:verify
+        run: npm run harness:verify -- --spec-complete
