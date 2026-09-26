@@ -12,5 +12,7 @@
 ## Documents
 
 - `core-beliefs.md`: agent-first developmentで維持する設計原則
+- `backend-persistence-architecture.md`: Hono feature の永続化境界、Drizzle ORM、D1 binding の責務分離
+- `open-innovation-ai-hypothesis-principles.md`: AI仮説と確認済み事実を分離するプロダクト設計原則
 
 参考: https://openai.com/index/harness-engineering/
