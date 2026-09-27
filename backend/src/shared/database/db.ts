@@ -7,6 +7,3 @@ import * as schema from './schema/consultations'
 export function createDatabase(binding: D1Database) {
   return drizzle(binding, { schema })
 }
-
-/** 各featureのrepositoryが受け取るDBの型。 */
-export type Database = ReturnType<typeof createDatabase>
