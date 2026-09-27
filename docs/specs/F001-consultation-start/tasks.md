@@ -45,7 +45,8 @@ T007 ではproduction deploy、production migration、secret変更、production 
 
 ## Review
 
-- Status: pending
-- Evidence: —
-- Reviewed at: —
-- Reviewed by: —
+
+- Status: reviewed
+- Evidence: PR #15
+- Reviewed at: 2026-09-27T02:50:37.000Z
+- Reviewed by: @yoshikatsu-shimizu-16
