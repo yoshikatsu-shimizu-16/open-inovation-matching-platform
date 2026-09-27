@@ -54,7 +54,7 @@ describe('Cloudflare Workers runtime', () => {
     })
   })
 
-  it('0001と0002の適用後にconsultationsの列とDrizzle書き込みが一致する', async () => {
+  it('相談テーブルに必要な列と制約が定義される', async () => {
     const bindings = env as unknown as TestBindings
     const columns = await bindings.DB.prepare(
       'PRAGMA table_info(consultations)',
@@ -74,7 +74,10 @@ describe('Cloudflare Workers runtime', () => {
       { name: 'created_at', type: 'TEXT', notnull: 1, pk: 0 },
       { name: 'updated_at', type: 'TEXT', notnull: 1, pk: 0 },
     ])
+  })
 
+  it('Drizzleで相談を保存すると対応するDB列に値が記録される', async () => {
+    const bindings = env as unknown as TestBindings
     const id = crypto.randomUUID()
     await createDatabase(bindings.DB).insert(consultations).values({
       id,
