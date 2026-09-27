@@ -5,7 +5,7 @@ import { createDatabase } from '../../src/shared/database/db'
 import { consultations } from '../../src/shared/database/schema/consultations'
 
 describe('consultations Drizzle schema', () => {
-  it('設計済みの列名と値でD1向けINSERTを生成する', () => {
+  it('カラム名と値が設計どおりのINSERT文になる', () => {
     const db = createDatabase({} as D1Database)
     const query = db
       .insert(consultations)
