@@ -4,6 +4,8 @@ import { beforeAll, describe, expect, it } from 'vitest'
 import type { Bindings } from '../../src/env'
 import { R2ObjectStorage } from '../../src/features/storage/r2-object-storage'
 import { createObjectKey } from '../../src/features/storage/object-key'
+import { createDatabase } from '../../src/shared/database/db'
+import { consultations } from '../../src/shared/database/schema/consultations'
 
 type TaskResponse = {
   id: string
@@ -49,6 +51,51 @@ describe('Cloudflare Workers runtime', () => {
       id: created.id,
       title: created.title,
       status: created.status,
+    })
+  })
+
+  it('0001と0002の適用後にconsultationsの列とDrizzle書き込みが一致する', async () => {
+    const bindings = env as unknown as TestBindings
+    const columns = await bindings.DB.prepare(
+      'PRAGMA table_info(consultations)',
+    ).all<{ name: string; type: string; notnull: number; pk: number }>()
+
+    expect(
+      columns.results.map(({ name, type, notnull, pk }) => ({
+        name,
+        type,
+        notnull,
+        pk,
+      })),
+    ).toEqual([
+      { name: 'id', type: 'TEXT', notnull: 1, pk: 1 },
+      { name: 'initial_content', type: 'TEXT', notnull: 1, pk: 0 },
+      { name: 'status', type: 'TEXT', notnull: 1, pk: 0 },
+      { name: 'created_at', type: 'TEXT', notnull: 1, pk: 0 },
+      { name: 'updated_at', type: 'TEXT', notnull: 1, pk: 0 },
+    ])
+
+    const id = crypto.randomUUID()
+    await createDatabase(bindings.DB).insert(consultations).values({
+      id,
+      initialContent: '共同研究先を探したい',
+      status: 'collecting_information',
+      createdAt: '2026-09-27T00:00:00.000Z',
+      updatedAt: '2026-09-27T00:00:00.000Z',
+    })
+
+    const row = await bindings.DB.prepare(
+      'SELECT id, initial_content, status, created_at, updated_at FROM consultations WHERE id = ?1',
+    )
+      .bind(id)
+      .first<Record<string, string>>()
+
+    expect(row).toEqual({
+      id,
+      initial_content: '共同研究先を探したい',
+      status: 'collecting_information',
+      created_at: '2026-09-27T00:00:00.000Z',
+      updated_at: '2026-09-27T00:00:00.000Z',
     })
   })
 
