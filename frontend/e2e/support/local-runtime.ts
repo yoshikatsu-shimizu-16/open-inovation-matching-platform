@@ -2,7 +2,8 @@ import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
 const HOST = '127.0.0.1'
-const PORT = 8787
+// 🔵 Intent: 開発用backendとwrangler devの既定8787と分け、別のサーバーへ誤って接続しない。
+const PORT = 8797
 
 /** E2Eで起動するWorkers + Assets + Hono + local D1のorigin。 */
 export const LOCAL_RUNTIME_URL = `http://${HOST}:${PORT}`

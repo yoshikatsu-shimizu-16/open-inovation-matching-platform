@@ -22,7 +22,8 @@ export default defineConfig({
     command: LOCAL_RUNTIME_COMMAND,
     cwd: BACKEND_DIRECTORY,
     url: `${LOCAL_RUNTIME_URL}/api/health`,
-    reuseExistingServer: !process.env.CI,
+    // 🔵 Intent: E2E専用のD1とAssetsを持つサーバーだけを使うため、起動済みサーバーを使い回さない。
+    reuseExistingServer: false,
   },
   projects: [
     {
