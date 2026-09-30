@@ -1,5 +1,11 @@
 import { defineConfig, devices } from '@playwright/test'
 
+import {
+  BACKEND_DIRECTORY,
+  LOCAL_RUNTIME_COMMAND,
+  LOCAL_RUNTIME_URL,
+} from './e2e/support/local-runtime.ts'
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
@@ -8,13 +14,16 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'http://127.0.0.1:4173',
+    baseURL: LOCAL_RUNTIME_URL,
     trace: 'on-first-retry',
   },
+  // 🔵 Intent: vite previewでは `/api/*` が404になるため、本番と同じWorkers + Assets構成で起動する。
   webServer: {
-    command: 'npm run preview',
-    url: 'http://127.0.0.1:4173',
-    reuseExistingServer: !process.env.CI,
+    command: LOCAL_RUNTIME_COMMAND,
+    cwd: BACKEND_DIRECTORY,
+    url: `${LOCAL_RUNTIME_URL}/api/health`,
+    // 🔵 Intent: E2E専用のD1とAssetsを持つサーバーだけを使うため、起動済みサーバーを使い回さない。
+    reuseExistingServer: false,
   },
   projects: [
     {
