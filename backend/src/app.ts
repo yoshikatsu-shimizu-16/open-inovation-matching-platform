@@ -6,15 +6,21 @@ import { healthRoute } from './features/health/route'
 import { InMemoryTaskRepository } from './features/tasks/in-memory-task-repository'
 import { createTaskRoutes } from './features/tasks/route'
 import type { TaskRepository } from './features/tasks/repository'
+import { createConsultationRoutes } from './features/consultations/route'
+import type { ConsultationRepository } from './features/consultations/repository'
 
 /**
  * Hono applicationを生成するcomposition root。
  * storage adapterを注入可能にし、feature sub-appを `app.route()` で合成する。
  */
-export function createApp(taskRepository?: TaskRepository) {
+export function createApp(
+  taskRepository?: TaskRepository,
+  consultationRepository?: ConsultationRepository,
+) {
   const app = factory.createApp()
   const fallbackRepository = taskRepository ?? new InMemoryTaskRepository()
-  const useBindings = taskRepository === undefined
+  const useTaskBindings = taskRepository === undefined
+  const useConsultationBindings = consultationRepository === undefined
 
   app.notFound((c) => {
     const response: ApiErrorResponse = {
@@ -58,7 +64,11 @@ export function createApp(taskRepository?: TaskRepository) {
 
   return app
     .route('/api/health', healthRoute)
-    .route('/api/tasks', createTaskRoutes(fallbackRepository, useBindings))
+    .route('/api/tasks', createTaskRoutes(fallbackRepository, useTaskBindings))
+    .route(
+      '/api/consultations',
+      createConsultationRoutes(consultationRepository, useConsultationBindings),
+    )
 }
 
 /** FrontendのHono RPC clientから利用するroot application type。 */
