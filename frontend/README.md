@@ -51,7 +51,10 @@ frontend/
 ├── AGENTS.md
 ├── SKILLS.md
 ├── e2e/
-│   └── smoke.spec.ts
+│   ├── local-runtime.spec.ts
+│   ├── smoke.spec.ts
+│   └── support/
+│       └── local-runtime.ts
 ├── src/
 │   ├── api/
 │   │   ├── httpClient.ts
@@ -159,6 +162,8 @@ npm run harness:verify
 ```
 
 Harness Verifyはformat / typecheck / lint / unit test / production build / Storybook build / browser E2Eを実行し、GitHub Actionsも同じHarnessを呼びます。
+
+Playwrightは `vite preview` ではなく、`backend/` の `wrangler dev`（Workers + Assets）を起動します。build済みのSPAと `/api/*`（Hono + local D1）が同じoriginで動き、起動前にE2E専用のlocal D1（`backend/.wrangler/e2e-state`）へmigrationを適用します。そのため `npm run test:e2e:run` の前に frontend のbuildが必要です。
 
 E2Eだけを単独実行する `npm run test:e2e` はproduction buildを先に行います。Harness/CIは既にproduction build済みなので、内部用 `test:e2e:run` を使って二重buildを避けます。
 

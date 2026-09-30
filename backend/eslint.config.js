@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint'
 
 export default defineConfig([
   {
-    ignores: ['dist', 'coverage'],
+    ignores: ['dist', 'coverage', '.wrangler'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

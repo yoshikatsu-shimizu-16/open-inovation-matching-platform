@@ -11,6 +11,9 @@
 
 ## 2026-09-30
 
-- T003: 実装済み、PRレビュー待ち。`features/consultations/domain/consultation.ts` に空白のみの本文を拒否する `Consultation.create` を、`repository.ts` に Drizzle 経由で保存する `createConsultationRepository` を追加した。共通 DB の型として `shared/database/db.ts` に `Database` を公開した。
+- T003: 完了。PR #18 でレビュー・マージ済み（merge commit `5b0504b`）。`features/consultations/domain/consultation.ts` に空白のみの本文を拒否する `Consultation.create` を、`repository.ts` に Drizzle 経由で保存する `createConsultationRepository` を追加した。共通 DB の型として `shared/database/db.ts` に `Database` を公開した。
 - 判断: 相談本文は REQ-003 の「入力された相談内容を起点とする」に合わせ、trim せず入力どおり保存する。空白判定だけ `trim()` 後に行う。
 - T003 検証: domain unit test（受理・本文保持・空白拒否）、feature 配下で D1 の `prepare()` / `bind()` / `run()` を使わないことの unit test、Worker + local D1 で保存・ログ非出力・同一 id 重複時のエラーを確認した。`npm run harness:verify` は終了コード 0。lint の警告は既存 frontend の2件のみ。
+- T004: 実装済み、PRレビュー待ち。Playwright の webServer を `vite preview` から `backend/` の `wrangler dev`（Workers + Assets）に替え、SPA と `/api/*` を同一 origin で起動する。起動前に E2E 専用の local D1（`backend/.wrangler/e2e-state`）へ `0001` → `0002` の migration を適用する。起動設定と D1 照会は `frontend/e2e/support/local-runtime.ts` にまとめた。
+- T004 検証: browser から `POST /api/tasks` を送り、local D1 の `tasks` に行が入ることを `wrangler d1 execute` で確認する E2E と、`consultations` テーブルが適用済みであることの E2E を追加した。既存の smoke 2件も新しい起動経路で PASS。E2E 用 D1 を消した空の状態からも PASS を確認した。
+- T004 付随修正: `wrangler dev` が `backend/.wrangler/tmp` に一時ファイルを作り、E2E 実行後の Harness で backend の Prettier が失敗したため、backend の `.prettierignore` と ESLint の ignores に `.wrangler` を追加した。`npm run harness:verify` は終了コード 0（E2E 4件 PASS、lint の警告は既存 frontend の2件のみ）。
