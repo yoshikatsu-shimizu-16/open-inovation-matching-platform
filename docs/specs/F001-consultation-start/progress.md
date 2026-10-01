@@ -31,3 +31,13 @@
 - R001: [仕様改訂案](../../drafts/pr20-review-response.md)を作成し、人間レビュー待ち。不正JSONを全API共通で`400 INVALID_REQUEST`へ変換する要求案と、共有local D1を使うE2Eの直列実行方針、受入条件、後続タスクの状態・依存関係・停止点を記録した。今回は文書のみで、T005のAPI修正・E2E設定修正・T006以降には進まない。
 - 調査根拠: 不正JSON、途中切れ、空本文で現行APIの500を再現した。Stop HookのHarnessは5 workerのE2EでD1ロックにより失敗した。変更前の`CI=true npm run harness:verify`は終了コード0、1 workerでE2E 5件成功。反復検証は未実施。
 - レビュー境界: requirementsをpendingへ戻すと、既存design/tasksの存在により現行Harnessが工程順序違反と判定する。正本とそのレビュー証跡を維持し、draftに改訂案を置いた。正本への反映と再レビューの手順は人間と確定してから着手する。draftの作成は仕様承認やコード修正の完了を意味しない。
+
+## 2026-10-01（R005 E2E設定修正）
+
+ユーザーの承認を受け、R005だけを実施した。`frontend/playwright.config.ts`を`workers: 1`、`fullyParallel: false`に変更し、ローカルとCIの両方でテストを順番に実行する。同じローカルD1を共有する構成と、保存件数を比較するテストは維持した。
+
+変更前のStop Hookでは、D1への問い合わせが`SQLITE_BUSY`で繰り返し失敗していた。変更後は`npm run test:e2e:run --workspace @dev-standard/frontend -- --retries=0`を3回連続で実行し、毎回5件が成功した。各回の終了コードは0で、D1ロックは発生しなかった。
+
+通常条件の`npm run harness:verify`はPASS、終了コード0。形式チェック、型チェック、lint、unit、runtime、Worker、integration、ビルド、Storybookビルド、E2E、差分チェックを通過した。Harness内のE2Eも5件成功した。lintには既存のfrontend警告が2件ある。ファイル編集時のHook起動は確認していないため、検証を手動で実行する。終了時のStop Hookの結果は、実際の起動後に確認する。
+
+今回の結果は既存E2Eの検証であり、R004で予定する不正JSONのケースは含まない。R002〜R004、T006以降、追加のコミット・Push・マージには進まない。

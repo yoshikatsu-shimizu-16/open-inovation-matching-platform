@@ -8,10 +8,11 @@ import {
 
 export default defineConfig({
   testDir: './e2e',
-  fullyParallel: true,
+  // 同じlocal D1を共有するため、保存と件数確認が競合しないよう順番に実行する。
+  fullyParallel: false,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: 1,
   reporter: 'html',
   use: {
     baseURL: LOCAL_RUNTIME_URL,
