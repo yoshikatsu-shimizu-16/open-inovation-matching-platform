@@ -18,3 +18,16 @@
 - T004 検証: `consultations` テーブルが E2E 用 local D1 に適用済みであることの E2E を追加した。browser から `/api/*` を通って D1 に保存されることは、F001 の要件外であるテンプレートの tasks に依存させないため T004 では確認せず、T005 の `POST /api/consultations` の E2E で確認する。既存の smoke 2件も新しい起動経路で PASS。E2E 用 D1 を消した空の状態からも PASS を確認した。
 - T004 付随修正: `wrangler dev` が `backend/.wrangler/tmp` に一時ファイルを作り、E2E 実行後の Harness で backend の Prettier が失敗したため、backend の `.prettierignore` と ESLint の ignores に `.wrangler` を追加した。`npm run harness:verify` は終了コード 0（E2E 4件 PASS、lint の警告は既存 frontend の2件のみ）。
 - T004 レビュー対応（PR #19）: 開発用 backend（`backend/src/dev.ts`）と `wrangler dev` の既定ポート 8787 と重なり、Playwright が起動済みの別サーバーを使い回すおそれがあった。E2E 専用ポートを 8797 にし、`reuseExistingServer` を `false` にした。
+
+## 2026-09-30 (T005)
+
+- T005: 実装済み、PRレビュー待ち。`features/consultations/commands/start-consultation.ts` で相談生成・保存後に `firstQuestion`（`consultation-goal`）と `progress`（`information-collection`）を組み立て、`features/consultations/route.ts` の `POST /` で JSON の `content` 検証と `201` 応答を実装した。`app.ts` は `createApp(taskRepository?, consultationRepository?)` の第2引数で consultation repository を注入可能にし、未指定時は `c.env.DB` から Drizzle 経由の repository を解決する。
+- T005 検証: backend integration test（正常系 `201` とレスポンス形状、空白入力の `400` + repository 不呼び出し、`content` が string でない request の `400`）、Worker + local D1 integration test（binding 経由で保存されること、応答に相談本文を含まないこと、空白入力で D1 の行数が増えないこと）、Playwright API contract E2E（`POST /api/consultations` を実際に Hono + local D1 まで通し、成功時の保存内容と失敗時の非永続化を確認）を追加した。`npm run harness:verify` は終了コード 0（backend unit/runtime/integration/worker、frontend unit、E2E 5件 PASS、lint の警告は既存 frontend の2件のみ）。
+- 判断: `firstQuestion` / `progress` は F001 の決定的な初期値として `commands/start-consultation.ts` に定数で持たせ、`handoff` / `nextFeature` など内部 feature 構成は応答へ露出させない（design.md のリスク欄と一致）。
+- 未検証事項: T006 で frontend から実際に呼び出す利用者フロー（成功時の表示、失敗時の入力保持・再試行）は本タスクの対象外。
+
+## 2026-10-01 (PR #20 レビュー対応・R001)
+
+- R001: [仕様改訂案](../../drafts/pr20-review-response.md)を作成し、人間レビュー待ち。不正JSONを全API共通で`400 INVALID_REQUEST`へ変換する要求案と、共有local D1を使うE2Eの直列実行方針、受入条件、後続タスクの状態・依存関係・停止点を記録した。今回は文書のみで、T005のAPI修正・E2E設定修正・T006以降には進まない。
+- 調査根拠: 不正JSON、途中切れ、空本文で現行APIの500を再現した。Stop HookのHarnessは5 workerのE2EでD1ロックにより失敗した。変更前の`CI=true npm run harness:verify`は終了コード0、1 workerでE2E 5件成功。反復検証は未実施。
+- レビュー境界: requirementsをpendingへ戻すと、既存design/tasksの存在により現行Harnessが工程順序違反と判定する。正本とそのレビュー証跡を維持し、draftに改訂案を置いた。正本への反映と再レビューの手順は人間と確定してから着手する。draftの作成は仕様承認やコード修正の完了を意味しない。
