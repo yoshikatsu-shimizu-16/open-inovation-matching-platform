@@ -10,6 +10,12 @@ resource "cloudflare_zero_trust_access_application" "preview" {
   type       = "self_hosted"
   domain     = var.preview_hostname
 
+  # 稼働中のWorkerを公開状態に戻さないため、gateの削除・hostname変更は別作業にする。
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = [domain]
+  }
+
   options_preflight_bypass   = false
   http_only_cookie_attribute = true
   session_duration           = "24h"

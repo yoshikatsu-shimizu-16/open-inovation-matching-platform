@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 
 /** 自由記述フォームの表示状態と操作。通信は呼び出し元へ委ねる。 */
 export type ConsultationStartFormProps = {
@@ -29,9 +30,9 @@ export function ConsultationStartForm({
     >
       <div className="space-y-2">
         <Label htmlFor="consultation-content">相談内容</Label>
-        <textarea
+        <Textarea
           id="consultation-content"
-          className="min-h-48 w-full resize-y rounded-lg border border-input bg-background px-3 py-3 text-base text-foreground outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+          className="min-h-48 resize-y"
           value={content}
           disabled={submitting}
           onChange={(event) => onContentChange(event.target.value)}

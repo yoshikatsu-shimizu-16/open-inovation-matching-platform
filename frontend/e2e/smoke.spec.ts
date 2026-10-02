@@ -14,9 +14,9 @@ test('unknown route renders not-found page and links home', async ({
   await page.goto('/does-not-exist')
 
   await expect(
-    page.getByRole('heading', { name: 'Page not found' }),
+    page.getByRole('heading', { name: 'ページが見つかりません' }),
   ).toBeVisible()
-  await page.getByRole('link', { name: 'Back to starter' }).click()
+  await page.getByRole('link', { name: '相談開始画面へ戻る' }).click()
 
   await expect(page).toHaveURL(/\/$/)
   await expect(

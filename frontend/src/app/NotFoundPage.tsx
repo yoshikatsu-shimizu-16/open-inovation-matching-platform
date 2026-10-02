@@ -2,7 +2,7 @@ import { Link } from 'react-router'
 
 /**
  * 未定義routeへ到達した場合のfallback page。
- * SPA内部navigationでstarter rootへ戻る導線を提供する。
+ * SPA内部の移動で相談開始画面へ戻る導線を提供する。
  */
 export function NotFoundPage() {
   return (
@@ -14,13 +14,13 @@ export function NotFoundPage() {
         id="not-found-title"
         className="m-0 text-4xl font-bold tracking-tight"
       >
-        Page not found
+        ページが見つかりません
       </h1>
       <p className="m-0 max-w-[60ch] leading-7 text-muted-foreground">
-        The requested route does not exist in this starter.
+        指定されたページは見つかりませんでした。相談開始画面へお戻りください。
       </p>
       <Link className="w-fit font-medium underline underline-offset-4" to="/">
-        Back to starter
+        相談開始画面へ戻る
       </Link>
     </section>
   )

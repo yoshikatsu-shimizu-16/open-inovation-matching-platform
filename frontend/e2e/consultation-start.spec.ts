@@ -46,25 +46,45 @@ test('空入力はAPIを呼ばず、相談を保存しない', async ({ page }) 
   )
 })
 
-test('通信失敗後も入力を保持し、再試行で実APIへ保存する', async ({ page }) => {
-  const content = `再試行する相談 ${crypto.randomUUID()}`
-  await page.route('**/api/consultations', (route) => route.abort('failed'), {
-    times: 1,
+for (const failure of ['通信失敗', 'サーバーエラー']) {
+  test(`${failure}後も入力を保持し、再試行で実APIへ保存する`, async ({
+    page,
+  }) => {
+    const content = `再試行する相談 ${crypto.randomUUID()}`
+    await page.route(
+      '**/api/consultations',
+      (route) =>
+        failure === '通信失敗'
+          ? route.abort('failed')
+          : route.fulfill({
+              status: 500,
+              contentType: 'application/json',
+              body: JSON.stringify({
+                error: {
+                  code: 'INTERNAL_ERROR',
+                  message: 'Internal server error.',
+                },
+              }),
+            }),
+      {
+        times: 1,
+      },
+    )
+    await page.goto('/')
+    await page.getByRole('textbox').fill(content)
+    await page.getByRole('button', { name: '相談を始める' }).click()
+    await expect(page.getByRole('alert')).toContainText('もう一度')
+    await expect(page.getByRole('textbox')).toHaveValue(content)
+    const responsePromise = page.waitForResponse((response) =>
+      response.url().endsWith('/api/consultations'),
+    )
+    await page.getByRole('button', { name: 'もう一度試す' }).click()
+    const result = await (await responsePromise).json()
+    await expect(page.getByText(result.firstQuestion.text)).toBeVisible()
+    expect(
+      queryLocalD1<{ initial_content: string }>(
+        `SELECT initial_content FROM consultations WHERE id = '${result.consultation.id}'`,
+      ),
+    ).toEqual([{ initial_content: content }])
   })
-  await page.goto('/')
-  await page.getByRole('textbox').fill(content)
-  await page.getByRole('button', { name: '相談を始める' }).click()
-  await expect(page.getByRole('alert')).toContainText('もう一度')
-  await expect(page.getByRole('textbox')).toHaveValue(content)
-  const responsePromise = page.waitForResponse((response) =>
-    response.url().endsWith('/api/consultations'),
-  )
-  await page.getByRole('button', { name: 'もう一度試す' }).click()
-  const result = await (await responsePromise).json()
-  await expect(page.getByText(result.firstQuestion.text)).toBeVisible()
-  expect(
-    queryLocalD1<{ initial_content: string }>(
-      `SELECT initial_content FROM consultations WHERE id = '${result.consultation.id}'`,
-    ),
-  ).toEqual([{ initial_content: content }])
-})
+}

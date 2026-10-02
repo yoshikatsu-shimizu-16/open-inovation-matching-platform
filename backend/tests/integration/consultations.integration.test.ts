@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { createApp } from '../../src/app'
 import type { Consultation } from '../../src/features/consultations/domain/consultation'
@@ -17,6 +17,38 @@ function createFakeConsultationRepository(): ConsultationRepository & {
 }
 
 describe('Consultations 開始API integration', () => {
+  afterEach(() => vi.restoreAllMocks())
+
+  it('保存失敗時は本文・SQL・stackを応答や一般ログへ出さない', async () => {
+    const content = '公開してはいけない相談本文'
+    const repository: ConsultationRepository = {
+      create: vi
+        .fn()
+        .mockRejectedValue(new Error(`SQL failure: INSERT ${content}`)),
+    }
+    const spies = (['log', 'info', 'warn', 'error', 'debug'] as const).map(
+      (method) => vi.spyOn(console, method).mockImplementation(() => {}),
+    )
+    const response = await createApp(undefined, repository).request(
+      '/api/consultations',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content }),
+      },
+    )
+    expect(response.status).toBe(500)
+    expect(await response.json()).toEqual({
+      error: { code: 'INTERNAL_ERROR', message: 'Internal server error.' },
+    })
+    const logged = spies
+      .flatMap((spy) => spy.mock.calls.flat())
+      .map(String)
+      .join('\n')
+    expect(logged).not.toContain(content)
+    expect(logged).not.toContain('INSERT')
+    expect(repository.create).toHaveBeenCalledTimes(1)
+  })
   it('自由記述からの相談開始をHTTP境界から実行できる', async () => {
     const repository = createFakeConsultationRepository()
     const app = createApp(undefined, repository)

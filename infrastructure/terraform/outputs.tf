@@ -20,7 +20,12 @@ output "environment" {
 
 output "preview_hostname" {
   description = "Accessで保護したpreviewのhostname。未設定なら空文字。"
-  value       = local.preview_access_enabled ? var.preview_hostname : ""
+  value       = try(cloudflare_zero_trust_access_application.preview[0].domain, "")
+
+  precondition {
+    condition     = try(cloudflare_zero_trust_access_application.preview[0].domain == var.preview_hostname, !local.preview_access_enabled)
+    error_message = "稼働中previewのhostname変更は、既存Workerの公開経路を閉じる別作業として実施する。"
+  }
 }
 
 output "preview_access_application_id" {

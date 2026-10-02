@@ -18,6 +18,14 @@ preview専用hostname全体をCloudflare Accessで保護するTerraform構成を
 
 GitHubのEnvironment一覧は空だった。Cloudflareの前提設定とremote previewでの認証・拒否の確認は未実施である。[previewアクセス制御の引き継ぎ](../../exec-plans/F001-preview-access.md)に前提、依存関係、受入条件、公開までの手順を残した。今回のT007の実装をremote公開の完了とは扱わない。
 
+## 2026-10-02（T008のローカル統合受入）
+
+T008としてHTTPの500と通信失敗の後の本文保持・再試行、保存失敗時の公開エラーとログを確認するテストを追加した。再試行の成功は実際のHonoとlocal D1で検証した。入力欄は既存CLIからshadcnのTextareaを追加して利用し、404画面から相談開始画面へ戻る導線も更新した。新しいpackageの追加やlockfile変更はない。
+
+T008の`npm run harness:verify`は終了コード0。frontend unit 13件、backend integration 6件、Worker 11件、infrastructure 9件、E2E 9件が成功した。Terraformの構成検証とmock test4件はPR #22のCIで成功した。remote-planはスキップであり、remote環境の検証成功ではない。
+
+[統合受入記録](acceptance.md)にREQ-001〜008の根拠、故障注入の範囲、未検証事項、再開手順を残した。リポジトリ内の実装とローカル受入はレビューへ引き渡せる。remote previewの利用者制限の実確認は環境設定後に残るため、F001全体の完了や全体台帳の「検証済み」への更新は行わない。不正JSON修正も保留のままとする。
+
 ## 2026-09-27
 
 - `sdd-analyze`: PASS。`npm run harness:verify -- --spec-complete` は終了コード 0。REQ-001〜008 の設計対応、設計要素と T001〜T008 の対応、constitution・用語・verification matrix との整合を確認した。
