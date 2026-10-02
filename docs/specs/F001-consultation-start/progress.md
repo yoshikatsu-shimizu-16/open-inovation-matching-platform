@@ -10,6 +10,14 @@
 - T006の検証: 実装前の新規テストは未実装のimportで失敗した。実装後はfrontend unit 13件とE2E 8件が成功し、`npm run harness:verify`は終了コード0。既存lint警告は2件。編集時の自動Hook起動は未確認のため、Harnessを手動実行した。
 - 後続: T007はT005に依存し、previewのアクセス境界を整備する。T008はT006・T007に依存し、統合受入結果と未検証事項をまとめる。承認済みの3タスクを順に実施し、不正JSON修正や後続機能の仕様化には進まない。
 
+## 2026-10-02（T007のリポジトリ内実装）
+
+preview専用hostname全体をCloudflare Accessで保護するTerraform構成を追加した。明示したメールアドレスだけを許可し、画面、静的ファイル、APIを同じ境界で保護する。前提未設定時はAccessを作らず、デプロイworkflowはWrangler設定生成で停止する。remote migrationやdeployには進まない。ローカル設定とpreview設定のworkers.dev・version URLも無効にした。
+
+設定生成のテストは実装前に5件が失敗し、実装後はinfrastructure全9件が成功した。T007実装後の`npm run harness:verify`は終了コード0、E2Eは8件成功した。Terraformの形式チェックは実施済み。ローカルの`terraform validate`はproviderが未取得のため終了コード1で失敗し、検証成功とは扱わない。ローカルTerraformも1.11.0で、要求される1.16系とは異なる。Terraformのschema検証とmock testは既存CIで確認する。
+
+GitHubのEnvironment一覧は空だった。Cloudflareの前提設定とremote previewでの認証・拒否の確認は未実施である。[previewアクセス制御の引き継ぎ](../../exec-plans/F001-preview-access.md)に前提、依存関係、受入条件、公開までの手順を残した。今回のT007の実装をremote公開の完了とは扱わない。
+
 ## 2026-09-27
 
 - `sdd-analyze`: PASS。`npm run harness:verify -- --spec-complete` は終了コード 0。REQ-001〜008 の設計対応、設計要素と T001〜T008 の対応、constitution・用語・verification matrix との整合を確認した。
