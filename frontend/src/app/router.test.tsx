@@ -13,11 +13,11 @@ function renderRoute(path: string) {
 }
 
 describe('app router', () => {
-  it('renders the starter route', () => {
+  it('renders the consultation-start route', () => {
     renderRoute('/')
 
     expect(
-      screen.getByRole('heading', { name: 'Frontend starter' }),
+      screen.getByRole('heading', { name: '相談を始める' }),
     ).toBeInTheDocument()
   })
 

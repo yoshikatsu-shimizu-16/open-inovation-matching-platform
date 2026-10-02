@@ -42,3 +42,15 @@ export async function getJson<T>(
 
   return (await response.json()) as T
 }
+
+/** JSON本文をPOSTし、既存のHTTPエラー処理を通して応答を返す。 */
+export function postJson<T>(
+  input: RequestInfo | URL,
+  body: unknown,
+): Promise<T> {
+  return getJson<T>(input, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+}

@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test'
 
-test('frontend starter renders', async ({ page }) => {
+test('consultation-start page renders', async ({ page }) => {
   await page.goto('/')
 
   await expect(
-    page.getByRole('heading', { name: 'Frontend starter' }),
+    page.getByRole('heading', { name: '相談を始める' }),
   ).toBeVisible()
 })
 
@@ -20,6 +20,6 @@ test('unknown route renders not-found page and links home', async ({
 
   await expect(page).toHaveURL(/\/$/)
   await expect(
-    page.getByRole('heading', { name: 'Frontend starter' }),
+    page.getByRole('heading', { name: '相談を始める' }),
   ).toBeVisible()
 })
