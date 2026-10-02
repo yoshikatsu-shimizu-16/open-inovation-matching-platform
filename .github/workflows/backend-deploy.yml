@@ -54,6 +54,11 @@ jobs:
           R2_BUCKET_NAME="$(terraform -chdir=infrastructure/terraform output -raw r2_bucket_name)"
           WORKER_NAME="${D1_DATABASE_NAME%-tasks}-worker"
           export D1_DATABASE_ID D1_DATABASE_NAME R2_BUCKET_NAME WORKER_NAME
+          if [ "$DEPLOY_ENVIRONMENT" = "preview" ]; then
+            PREVIEW_HOSTNAME="$(terraform -chdir=infrastructure/terraform output -raw preview_hostname)"
+            PREVIEW_ACCESS_APPLICATION_ID="$(terraform -chdir=infrastructure/terraform output -raw preview_access_application_id)"
+            export PREVIEW_HOSTNAME PREVIEW_ACCESS_APPLICATION_ID
+          fi
           npm run infrastructure:generate-wrangler -- --output backend/wrangler.remote.jsonc
           echo "D1_DATABASE_NAME=$D1_DATABASE_NAME" >> "$GITHUB_ENV"
       - name: Apply D1 migrations

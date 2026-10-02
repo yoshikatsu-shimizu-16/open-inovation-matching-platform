@@ -1,5 +1,31 @@
 # F001 実装進捗
 
+## 2026-10-02（R005のマージとT006）
+
+ユーザーはR005のmainへの反映と、T006・T007・T008の実施を指示した。不正JSONへの対応R002〜R004は保留する。既存チェック項目の未更新原因の調査は今回の対象にしない。
+
+- R005: PR #21のCI成功後にmainへマージした。merge commitは`a4f7de4`。
+- T006: 相談開始画面、本文を保持するhook、POST用HTTP処理と相談API client、index route、主要4状態のStorybookを実装した。
+- T006の受入条件: 空白入力時のAPI不呼び出し、送信中の多重操作抑止、成功時の問い・進行状況表示、HTTP・通信失敗後の本文保持と再試行を検証した。成功と再試行のE2Eは実際のHonoとlocal D1を通し、保存された本文も確認した。
+- T006の検証: 実装前の新規テストは未実装のimportで失敗した。実装後はfrontend unit 13件とE2E 8件が成功し、`npm run harness:verify`は終了コード0。既存lint警告は2件。編集時の自動Hook起動は未確認のため、Harnessを手動実行した。
+- 後続: T007はT005に依存し、previewのアクセス境界を整備する。T008はT006・T007に依存し、統合受入結果と未検証事項をまとめる。承認済みの3タスクを順に実施し、不正JSON修正や後続機能の仕様化には進まない。
+
+## 2026-10-02（T007のリポジトリ内実装）
+
+preview専用hostname全体をCloudflare Accessで保護するTerraform構成を追加した。明示したメールアドレスだけを許可し、画面、静的ファイル、APIを同じ境界で保護する。前提未設定時はAccessを作らず、デプロイworkflowはWrangler設定生成で停止する。remote migrationやdeployには進まない。ローカル設定とpreview設定のworkers.dev・version URLも無効にした。
+
+設定生成のテストは実装前に5件が失敗し、実装後はinfrastructure全9件が成功した。T007実装後の`npm run harness:verify`は終了コード0、E2Eは8件成功した。Terraformの形式チェックは実施済み。ローカルの`terraform validate`はproviderが未取得のため終了コード1で失敗し、検証成功とは扱わない。ローカルTerraformも1.11.0で、要求される1.16系とは異なる。Terraformのschema検証とmock testは既存CIで確認する。
+
+GitHubのEnvironment一覧は空だった。Cloudflareの前提設定とremote previewでの認証・拒否の確認は未実施である。[previewアクセス制御の引き継ぎ](../../exec-plans/F001-preview-access.md)に前提、依存関係、受入条件、公開までの手順を残した。今回のT007の実装をremote公開の完了とは扱わない。
+
+## 2026-10-02（T008のローカル統合受入）
+
+T008としてHTTPの500と通信失敗の後の本文保持・再試行、保存失敗時の公開エラーとログを確認するテストを追加した。再試行の成功は実際のHonoとlocal D1で検証した。入力欄は既存CLIからshadcnのTextareaを追加して利用し、404画面から相談開始画面へ戻る導線も更新した。新しいpackageの追加やlockfile変更はない。
+
+T008の`npm run harness:verify`は終了コード0。frontend unit 13件、backend integration 6件、Worker 11件、infrastructure 9件、E2E 9件が成功した。Terraformの構成検証とmock test4件はPR #22のCIで成功した。remote-planはスキップであり、remote環境の検証成功ではない。
+
+[統合受入記録](acceptance.md)にREQ-001〜008の根拠、故障注入の範囲、未検証事項、再開手順を残した。リポジトリ内の実装とローカル受入はレビューへ引き渡せる。remote previewの利用者制限の実確認は環境設定後に残るため、F001全体の完了や全体台帳の「検証済み」への更新は行わない。不正JSON修正も保留のままとする。
+
 ## 2026-09-27
 
 - `sdd-analyze`: PASS。`npm run harness:verify -- --spec-complete` は終了コード 0。REQ-001〜008 の設計対応、設計要素と T001〜T008 の対応、constitution・用語・verification matrix との整合を確認した。

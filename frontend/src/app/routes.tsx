@@ -1,5 +1,5 @@
 import type { RouteObject } from 'react-router'
-import { StarterOverview } from '@/features/starter/StarterOverview'
+import { ConsultationStartPage } from '@/features/consultation-start/ConsultationStartPage'
 import { App } from './App'
 import { NotFoundPage } from './NotFoundPage'
 
@@ -9,7 +9,7 @@ export const appRoutes = [
     children: [
       {
         index: true,
-        element: <StarterOverview />,
+        element: <ConsultationStartPage />,
       },
       {
         path: '*',

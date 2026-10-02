@@ -1,7 +1,9 @@
 import { applyD1Migrations, env, SELF, type D1Migration } from 'cloudflare:test'
-import { beforeAll, describe, expect, it } from 'vitest'
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import type { Bindings } from '../../src/env'
+import { createApp } from '../../src/app'
+import type { ConsultationRepository } from '../../src/features/consultations/repository'
 
 type TestBindings = Bindings & {
   TEST_MIGRATIONS: D1Migration[]
@@ -14,6 +16,46 @@ type StartConsultationResponse = {
 }
 
 describe('POST /api/consultations (Cloudflare Workers runtime)', () => {
+  afterEach(() => vi.restoreAllMocks())
+
+  it('Workerでも保存失敗の内部情報を公開せず、D1の件数を増やさない', async () => {
+    const database = (env as unknown as TestBindings).DB
+    const before = await database
+      .prepare('SELECT COUNT(*) as count FROM consultations')
+      .first<{ count: number }>()
+    const content = 'Workerで公開してはいけない本文'
+    const repository: ConsultationRepository = {
+      create: vi
+        .fn()
+        .mockRejectedValue(new Error(`SQL failure: INSERT ${content}`)),
+    }
+    const logSpies = (['log', 'info', 'warn', 'error', 'debug'] as const).map(
+      (method) => vi.spyOn(console, method).mockImplementation(() => {}),
+    )
+    const response = await createApp(undefined, repository).request(
+      '/api/consultations',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content }),
+      },
+    )
+    expect(response.status).toBe(500)
+    expect(await response.json()).toEqual({
+      error: { code: 'INTERNAL_ERROR', message: 'Internal server error.' },
+    })
+    expect(
+      logSpies
+        .flatMap((spy) => spy.mock.calls.flat())
+        .map(String)
+        .join('\n'),
+    ).not.toContain(content)
+    expect(
+      await database
+        .prepare('SELECT COUNT(*) as count FROM consultations')
+        .first(),
+    ).toEqual(before)
+  })
   beforeAll(async () => {
     const bindings = env as unknown as TestBindings
     await applyD1Migrations(bindings.DB, bindings.TEST_MIGRATIONS)

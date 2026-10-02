@@ -13,11 +13,11 @@ function renderRoute(path: string) {
 }
 
 describe('app router', () => {
-  it('renders the starter route', () => {
+  it('renders the consultation-start route', () => {
     renderRoute('/')
 
     expect(
-      screen.getByRole('heading', { name: 'Frontend starter' }),
+      screen.getByRole('heading', { name: '相談を始める' }),
     ).toBeInTheDocument()
   })
 
@@ -25,10 +25,10 @@ describe('app router', () => {
     renderRoute('/does-not-exist')
 
     expect(
-      screen.getByRole('heading', { name: 'Page not found' }),
+      screen.getByRole('heading', { name: 'ページが見つかりません' }),
     ).toBeInTheDocument()
     expect(
-      screen.getByRole('link', { name: 'Back to starter' }),
+      screen.getByRole('link', { name: '相談開始画面へ戻る' }),
     ).toHaveAttribute('href', '/')
   })
 })
